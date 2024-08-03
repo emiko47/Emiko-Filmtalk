@@ -1,72 +1,88 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useState } from "react";
 import './index.css';
-import { ChakraProvider } from '@chakra-ui/react';
-import { Input } from '@chakra-ui/react';
-import {
-    Menu,
-    MenuButton,
-    MenuList,
-    MenuItem,
-    MenuItemOption,
-    MenuGroup,
-    MenuOptionGroup,
-    MenuDivider,
-} from '@chakra-ui/react';
-import { ChevronDownIcon} from '@chakra-ui/icons'
-import { Button, ButtonGroup } from '@chakra-ui/react'
-import { Select } from '@chakra-ui/react'
-import {
-    useDisclosure,
-    Spinner,
-    Modal,
-    ModalOverlay,
-    ModalContent,
-    ModalHeader,
-    ModalFooter,
-    ModalBody,
-    ModalCloseButton,
-} from '@chakra-ui/react'
-
-
-
-
+import { ChakraProvider, Input, Select, Button, Alert, AlertIcon, AlertTitle, AlertDescription, useDisclosure, Spinner, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, VStack, Box, useToast } from '@chakra-ui/react';
 
 function Filmtalk() {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [isLoading, setIsLoading] = useState(false);
+    const [movieCards, setMovieCards] = useState([]);
+    const [movieDetails, setMovieDetails] = useState({
+        name: '',
+        year: '',
+        genre1: '',
+        genre2: '',
+        img: '',
+        about: ''
+    });
+    const [error, setError] = useState(null);
+    const toast = useToast();
 
     const handleSubmit = () => {
-        setIsLoading(true);
-        // Simulate a network request or some processing delay
-        setTimeout(() => {
-            setIsLoading(false);
-            onClose();
-        }, 1000); // 1 second delay
-    };
+        const { name, year, genre1, genre2, img, about } = movieDetails;//Remember this line here is almost like assigning variables in a reverse manner. All the fields defined in the movieDetails useState make up the "updated" movieDetails. Remember this is also known as destructuring. We're getting only the fields we need from movieDetails.
 
+        // Validate Name
+        if (!name.trim()) {
+            setError('Please enter a name');
+            return;
+        }
 
+        // Validate Year
+        const yearNum = parseInt(year, 10);//parses the year string as an integer and makes sure it is in decimal format
+        if (isNaN(yearNum) || yearNum < 1800 || yearNum > 2024) {
+            setError('Please enter a valid Year');
+            return;
+        }
 
-    function addCard(name, year, genre, img, about) {
-        return(
-            <div className='movie_card'>
-                <div classname='card_img'>
+        // Clear error
+        setError(null);
 
+        // Create new card //img src is only assigned if the 'img' from props exists
+        const newCard = (
+            <div className='movie_card' key={`movie_card_${name}`}>
+                <div className='card_img'>
+                    {img && <img className='new_img' src={img} alt={name} />}
                 </div>
                 <div className='card_rightside'>
-                    <p classname='card_title'></p>
-                    <div className='deets'></div>
+                    <p className='card_title'>{name}</p>
+                    <p className='card_yearandgenre'>{year}&nbsp;|&nbsp;{[genre1, genre2].filter(Boolean).join(', ')}</p>
+                    <div className='deets'>{about}</div>
                 </div>
             </div>
         );
-    }
+            //on line 49 array is created with the genres, then 'filter(Boolean) is called on the array to filter out any false or null values'
+        setMovieCards([...movieCards, newCard]);
+        onClose();
+        toast({
+            title: 'Success',
+            description: 'Your Recommendation has been added',
+            status: 'success',
+            duration: 3000,
+            isClosable: true,
+        });
 
+        // Reset movie details
+        setMovieDetails({
+            name: '',
+            year: '',
+            genre1: '',
+            genre2: '',
+            img: '',
+            about: ''
+        });
+    };
 
+    const handleChange = (e) => {//We use this handler to dynamically update the value of the movieDetails
+        const { id, value } = e.target;
+        setMovieDetails(prevDetails => ({
+            ...prevDetails,
+            [id]: value
+        }));
+    };
 
     return (
         <ChakraProvider>
             <section className='fullbody'>
                 <nav className='navig'>
-                    <img src="data:image/png;base64,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" />
                     FilmTalk
                     <p className='tag'>by Emiko</p>
                 </nav>
@@ -99,30 +115,72 @@ function Filmtalk() {
                         </div>
                     </div>
                     <div className='cardbox'>
-                        {/* Add your movie cards here */}
+                        {movieCards}
                     </div>
                 </div>
 
                 {/* Modal */}
-                <Modal isOpen={isOpen} onClose={onClose}>
+                <Modal id='movie_entry' isOpen={isOpen} onClose={onClose}>
                     <ModalOverlay />
                     <ModalContent>
                         <ModalHeader>Add a Movie Recommendation</ModalHeader>
                         <ModalCloseButton />
                         <ModalBody>
-                            {/* Add your form inputs here */}
-                            <div id='movname'>Name:<Input id='mov_namebar' focusBorderColor='rgb(62, 176, 246)' placeholder='e.g. Transformers' /></div>
-                            <div id='movyear'>Release Year:<Input id='mov_yearbar' focusBorderColor='rgb(62, 176, 246)' placeholder='e.g. 1996' /></div>
-                            <div id='movgenre'>Genre:<Input id='mov_genrebar' focusBorderColor='rgb(62, 176, 246)' placeholder='e.g. Romance' /></div>
-                            <div id='movimg'>Image link (Optional):<Input id='mov_imgbar' focusBorderColor='rgb(62, 176, 246)' placeholder='' /></div>
-                            <div id='movabout'>About:<Input id='mov_aboutbar' focusBorderColor='rgb(62, 176, 246)' placeholder='e.g. Tell us about the movie...' /></div>
+                            
+                                <Box id='movname'>
+                                    Name:<Input id='name' focusBorderColor='rgb(62, 176, 246)' placeholder='e.g. Transformers' value={movieDetails.name} onChange={handleChange} />
+                                </Box>
+                                <Box id='movyear'>
+                                    Release Year:<Input id='year' focusBorderColor='rgb(62, 176, 246)' placeholder='e.g. 1996' value={movieDetails.year} onChange={handleChange} />
+                                </Box>
+                                <Box id='movgenre1'>
+                                    Genre1: 
+                                    <Select id='genre1' iconSize='20px' className='genre_filter' placeholder='None' value={movieDetails.genre1} onChange={handleChange}>
+                                        <option value='Romance'>Romance</option>
+                                        <option value='Thriller'>Thriller</option>
+                                        <option value='Action'>Action</option>
+                                        <option value='Comedy'>Comedy</option>
+                                        <option value='Horror'>Horror</option>
+                                        <option value='Black Voices'>Black Voices</option>
+                                        <option value='Anime'>Anime</option>
+                                        <option value='Fantasy'>Fantasy</option>
+                                        <option value='Documentary/Docuseries'>Documentary/Docuseries</option>
+                                    </Select>
+                                </Box>
+                                <Box id='movgenre2'>
+                                    Genre2:
+                                    <Select id='genre2' iconSize='20px' className='genre_filter' placeholder='None' value={movieDetails.genre2} onChange={handleChange}>
+                                        <option value='Romance'>Romance</option>
+                                        <option value='Thriller'>Thriller</option>
+                                        <option value='Action'>Action</option>
+                                        <option value='Comedy'>Comedy</option>
+                                        <option value='Horror'>Horror</option>
+                                        <option value='Black Voices'>Black Voices</option>
+                                        <option value='Anime'>Anime</option>
+                                        <option value='Fantasy'>Fantasy</option>
+                                        <option value='Documentary/Docuseries'>Documentary/Docuseries</option>
+                                    </Select>
+                                </Box>
+                                <Box id='movimg'>
+                                    Image link (Optional):<Input id='img' focusBorderColor='rgb(62, 176, 246)' placeholder='' value={movieDetails.img} onChange={handleChange} />
+                                </Box>
+                                <Box id='movabout'>
+                                    About:<Input id='about' focusBorderColor='rgb(62, 176, 246)' placeholder='e.g. Tell us about the movie...' value={movieDetails.about} onChange={handleChange} />
+                                </Box>
+                        
+                            {error && (
+                                <Alert status='error' mt={4}>
+                                    <AlertIcon />
+                                    <AlertTitle>{error}</AlertTitle>
+                                </Alert>
+                            )}
                         </ModalBody>
                         <ModalFooter>
                             <Button colorScheme='rgb(2, 2, 100);' mr={3} onClick={onClose}>
                                 Close
                             </Button>
                             <Button
-                                
+                                id='submit_details'
                                 variant='ghost'
                                 onClick={handleSubmit}
                                 isLoading={isLoading}

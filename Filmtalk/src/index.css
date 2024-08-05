@@ -34,7 +34,7 @@ code {
 .navig{
   height: 100px;
   width: 100vw;
-  background-color: rgb(2, 2, 100);
+  background-color: rgb(62, 176, 246);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -125,7 +125,7 @@ code {
 
 #filter{
   height: 30px;
-  width: 120px;
+  width: fit-content;
 }
 
 #addrec{
@@ -142,7 +142,7 @@ code {
 .cardbox{
   display: flex;
   flex-direction: row;
-  
+  overflow:scroll;
   margin-top: 5px;
   flex-wrap: wrap;
 }

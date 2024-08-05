@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import './index.css';
-import { ChakraProvider, Input, Select, Button, Alert, AlertIcon, AlertTitle, AlertDescription, useDisclosure, Spinner, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, VStack, Box, useToast } from '@chakra-ui/react';
+import { ChakraProvider, Input, Select, Button, Alert, AlertIcon, AlertTitle, Box, useDisclosure, Spinner, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, useToast } from '@chakra-ui/react';
 
 function Filmtalk() {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [isLoading, setIsLoading] = useState(false);
     const [movieCards, setMovieCards] = useState([]);
+    const [displayedCards, setDisplayedCards] = useState([]);
     const [movieDetails, setMovieDetails] = useState({
         name: '',
         year: '',
@@ -15,10 +16,11 @@ function Filmtalk() {
         about: ''
     });
     const [error, setError] = useState(null);
+    const [selectedFilter, setSelectedFilter] = useState('None');
     const toast = useToast();
 
     const handleSubmit = () => {
-        const { name, year, genre1, genre2, img, about } = movieDetails;//Remember this line here is almost like assigning variables in a reverse manner. All the fields defined in the movieDetails useState make up the "updated" movieDetails. Remember this is also known as destructuring. We're getting only the fields we need from movieDetails.
+        const { name, year, genre1, genre2, img, about } = movieDetails;
 
         // Validate Name
         if (!name.trim()) {
@@ -27,7 +29,7 @@ function Filmtalk() {
         }
 
         // Validate Year
-        const yearNum = parseInt(year, 10);//parses the year string as an integer and makes sure it is in decimal format
+        const yearNum = parseInt(year, 10);
         if (isNaN(yearNum) || yearNum < 1800 || yearNum > 2024) {
             setError('Please enter a valid Year');
             return;
@@ -36,21 +38,18 @@ function Filmtalk() {
         // Clear error
         setError(null);
 
-        // Create new card //img src is only assigned if the 'img' from props exists
-        const newCard = (
-            <div className='movie_card' key={`movie_card_${name}`}>
-                <div className='card_img'>
-                    {img && <img className='new_img' src={img} alt={name} />}
-                </div>
-                <div className='card_rightside'>
-                    <p className='card_title'>{name}</p>
-                    <p className='card_yearandgenre'>{year}&nbsp;|&nbsp;{[genre1, genre2].filter(Boolean).join(', ')}</p>
-                    <div className='deets'>{about}</div>
-                </div>
-            </div>
-        );
-            //on line 49 array is created with the genres, then 'filter(Boolean) is called on the array to filter out any false or null values'
+        // Create new card
+        const newCard = {
+            name,
+            year,
+            genre1,
+            genre2,
+            img,
+            about
+        };
+
         setMovieCards([...movieCards, newCard]);
+        setDisplayedCards([...movieCards, newCard]);
         onClose();
         toast({
             title: 'Success',
@@ -71,12 +70,39 @@ function Filmtalk() {
         });
     };
 
-    const handleChange = (e) => {//We use this handler to dynamically update the value of the movieDetails
+    const handleChange = (e) => {
         const { id, value } = e.target;
         setMovieDetails(prevDetails => ({
             ...prevDetails,
             [id]: value
         }));
+    };
+
+    const handleFilterChange = (e) => {
+        const value = e.target.value;
+        setSelectedFilter(value);
+        handleFilter(value);
+    };
+
+    const handleFilter = (filter) => {
+        if (filter === 'None') {
+            setDisplayedCards(movieCards);
+        } else if (filter.startsWith('Sort:')) {
+            let sortedCards = [...displayedCards];
+            if (filter === 'Sort: A-Z') {
+                sortedCards.sort((a, b) => a.name.localeCompare(b.name));
+            } else if (filter === 'Sort: Z-A') {
+                sortedCards.sort((a, b) => b.name.localeCompare(a.name));
+            } else if (filter === 'Year Released:E-L') {
+                sortedCards.sort((a, b) => a.year - b.year);
+            } else if (filter === 'Year Released:L-E') {
+                sortedCards.sort((a, b) => b.year - a.year);
+            }
+            setDisplayedCards(sortedCards);
+        } else {
+            const filteredCards = movieCards.filter(card => card.genre1 === filter || card.genre2 === filter);
+            setDisplayedCards(filteredCards);
+        }
     };
 
     return (
@@ -98,24 +124,40 @@ function Filmtalk() {
                             <Input id='searchbar' focusBorderColor='rgb(62, 176, 246)' placeholder='Search Movies...' />
                         </div>
                         <div className="rightside">
-                            <Select iconSize='0px' id='filter' placeholder='Filter'>
-                                <option value='option1'>Sort: A-Z</option>
-                                <option value='option2'>Sort: Z-A</option>
-                                <option value='option3'>Year Released (Earliest to Latest)</option>
-                                <option value='option4'>Year Released (Latest to Earliest)</option>
-                                <option value='option5'>Romance</option>
-                                <option value='option6'>Thriller</option>
-                                <option value='option7'>Action</option>
-                                <option value='option8'>Comedy</option>
-                                <option value='option9'>Horror</option>
-                                <option value='option10'>Black Voices</option>
-                                <option value='option11'>None</option>
+                            <p>Filter:</p>
+                            &nbsp;
+                            <Select iconSize='14px' id='filter' placeholder='None' onChange={handleFilterChange}>
+                                <option value='Sort: A-Z'>Sort: A-Z</option>
+                                <option value='Sort: Z-A'>Sort: Z-A</option>
+                                <option value='Year Released:E-L'>Year Released (Earliest to Latest)</option>
+                                <option value='Year Released:L-E'>Year Released (Latest to Earliest)</option>
+                                <option value='Romance'>Romance</option>
+                                <option value='Thriller'>Thriller</option>
+                                <option value='Action'>Action</option>
+                                <option value='Comedy'>Comedy</option>
+                                <option value='Horror'>Horror</option>
+                                <option value='Black Voices'>Black Voices</option>
+                                <option value='Anime'>Anime</option>
+                                <option value='Fantasy'>Fantasy</option>
+                                <option value='Documentary/Docuseries'>Documentary/Docuseries</option>
+                                <option value='None'>None</option>
                             </Select>
                             <Button id='addrec' colorScheme='rgb(62, 176, 246);' onClick={onOpen}>+ Add</Button>
                         </div>
                     </div>
                     <div className='cardbox'>
-                        {movieCards}
+                        {displayedCards.map(card => (
+                            <div className='movie_card' key={`movie_card_${card.name}`}>
+                                <div className='card_img'>
+                                    {card.img && <img className='new_img' src={card.img} alt={card.name} />}
+                                </div>
+                                <div className='card_rightside'>
+                                    <p className='card_title'>{card.name}</p>
+                                    <p className='card_yearandgenre'>{card.year}&nbsp;|&nbsp;{[card.genre1, card.genre2].filter(Boolean).join(', ')}</p>
+                                    <div className='deets'>{card.about}</div>
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 </div>
 

@@ -17,6 +17,7 @@ function Filmtalk() {
     });
     const [error, setError] = useState(null);
     const [selectedFilter, setSelectedFilter] = useState('None');
+    const [searchQuery, setSearchQuery] = useState('');
     const toast = useToast();
 
     const handleSubmit = () => {
@@ -70,6 +71,21 @@ function Filmtalk() {
         });
     };
 
+    // Dynamically checks all the movie cards and filters them based on the search query
+    const handleSearch = (e) => {
+        const query = e.target.value.toLowerCase();
+        setSearchQuery(query);
+        if (query === '') {
+            setDisplayedCards(movieCards);
+        } else {
+            const filteredCards = movieCards.filter(card =>
+                card.name.toLowerCase().includes(query)
+            );
+            setDisplayedCards(filteredCards);
+        }
+    };
+
+    // Here we use handleChange to dynamically update each field in the movieDetails useState
     const handleChange = (e) => {
         const { id, value } = e.target;
         setMovieDetails(prevDetails => ({
@@ -85,24 +101,29 @@ function Filmtalk() {
     };
 
     const handleFilter = (filter) => {
-        if (filter === 'None') {
-            setDisplayedCards(movieCards);
-        } else if (filter.startsWith('Sort:')) {
-            let sortedCards = [...displayedCards];
-            if (filter === 'Sort: A-Z') {
-                sortedCards.sort((a, b) => a.name.localeCompare(b.name));
-            } else if (filter === 'Sort: Z-A') {
-                sortedCards.sort((a, b) => b.name.localeCompare(a.name));
-            } else if (filter === 'Year Released:E-L') {
-                sortedCards.sort((a, b) => a.year - b.year);
-            } else if (filter === 'Year Released:L-E') {
-                sortedCards.sort((a, b) => b.year - a.year);
+        let filteredCards = [...movieCards];
+        if (filter !== 'None') {
+            if (filter.startsWith('Sort:')) {
+                if (filter === 'Sort: A-Z') {
+                    filteredCards.sort((a, b) => a.name.localeCompare(b.name));
+                } else if (filter === 'Sort: Z-A') {
+                    filteredCards.sort((a, b) => b.name.localeCompare(a.name));
+                } else if (filter === 'Year Released:E-L') {
+                    filteredCards.sort((a, b) => a.year - b.year);
+                } else if (filter === 'Year Released:L-E') {
+                    filteredCards.sort((a, b) => b.year - a.year);
+                }
+            } else {
+                filteredCards = movieCards.filter(card => card.genre1 === filter || card.genre2 === filter);
             }
-            setDisplayedCards(sortedCards);
-        } else {
-            const filteredCards = movieCards.filter(card => card.genre1 === filter || card.genre2 === filter);
-            setDisplayedCards(filteredCards);
         }
+        // Apply the search query filter
+        if (searchQuery !== '') {
+            filteredCards = filteredCards.filter(card =>
+                card.name.toLowerCase().includes(searchQuery)
+            );
+        }
+        setDisplayedCards(filteredCards);
     };
 
     return (
@@ -121,7 +142,13 @@ function Filmtalk() {
                 <div className='moviebox'>
                     <div className='topbar'>
                         <div id='search'>
-                            <Input id='searchbar' focusBorderColor='rgb(62, 176, 246)' placeholder='Search Movies...' />
+                            <Input
+                                id='searchbar'
+                                focusBorderColor='rgb(62, 176, 246)'
+                                placeholder='Search Movies...'
+                                value={searchQuery}
+                                onChange={handleSearch}
+                            />
                         </div>
                         <div className="rightside">
                             <p>Filter:</p>

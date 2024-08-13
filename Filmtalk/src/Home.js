@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import './index.css';
-
+import { isLoggedIn, setUserSession } from './AuthServices';
 
 const Home = () => {
     const [currentForm, setCurrentForm] = useState('login');
-    const [isLoggedIn, setUserSession] = useState('');
+    
 
 
     const renderForm = () => {
@@ -49,36 +49,45 @@ const Home = () => {
 
 
 const LoginForm = () => {
-    const [message, setMessage] = useState('');
-  //call lambda functions here later. For now we're just simulating
-    const handleLogin = async () => {
-      const username = document.querySelector('#login-username').value;
-      const password = document.querySelector('#login-password').value;
-  
-      try {
-        if (response.ok) {
-          setUserSession(data.user, data.token); // Save user session
-          setMessage('Login successful!');
-          // Optionally, redirect or update state as needed
-        } else {
-          setMessage(data.message || 'Login failed. Please check your credentials.');
-        }
-      } catch (error) {
-        setMessage('An error occurred. Please try again.');
-      }
-    };
-  
-    return (
-      <div>
-        <h2>Log In</h2>
-        <input type="text" id="login-username" placeholder="Username" />
-        <input type="password" id="login-password" placeholder="Password" />
-        <button onClick={handleLogin}>Log In</button>
-        {message && <p>{message}</p>}
-      </div>
-    );
-};
+  const [message, setMessage] = useState('');
 
+  const handleLogin = async () => {
+    const username = document.querySelector('#login-username').value;
+    const password = document.querySelector('#login-password').value;
+
+    try {
+      const response = await fetch(process.env.REACT_APP_LOGIN_URL, {//login url is called from environment variables here
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': process.env.REACT_APP_API_TOKEN,
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setUserSession(data.user, data.token); // Save user session
+        setMessage('Login successful!');
+        // Optionally, redirect or update state as needed
+      } else {
+        setMessage(data.message || 'Login failed. Please check your credentials.');
+      }
+    } catch (error) {
+      setMessage('An error occurred. Please try again.');
+    }
+  };
+
+  return (
+    <div>
+      <h2>Log In</h2>
+      <input type="text" id="login-username" placeholder="Username" />
+      <input type="password" id="login-password" placeholder="Password" />
+      <button onClick={handleLogin}>Log In</button>
+      {message && <p>{message}</p>}
+    </div>
+  );
+};
 
 const RegisterForm = () => {
     const [message, setMessage] = useState('');

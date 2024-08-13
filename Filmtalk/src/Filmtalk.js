@@ -126,6 +126,10 @@ function Filmtalk() {
         setDisplayedCards(filteredCards);
     };
 
+    const enlargeCard = (name, imgsrc, year, about, genre1, genre2 ) =>{
+
+    };
+
     return (
         <ChakraProvider>
             <section className='fullbody'>
@@ -174,7 +178,7 @@ function Filmtalk() {
                     </div>
                     <div className='cardbox'>
                         {displayedCards.map(card => (
-                            <div className='movie_card' key={`movie_card_${card.name}`}>
+                            <div className='movie_card' onClick={enlargeCard()}key={`movie_card_${card.name}`}>
                                 <div className='card_img'>
                                     {card.img && <img className='new_img' src={card.img} alt={card.name} />}
                                 </div>

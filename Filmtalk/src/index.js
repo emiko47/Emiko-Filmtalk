@@ -2,16 +2,33 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
+import Home from './Home';
+import Navbar from './Navbar';
 import reportWebVitals from './reportWebVitals';
 import Filmtalk from './Filmtalk';
-import { ChakraProvider } from '@chakra-ui/react'
-
+import { ChakraProvider } from '@chakra-ui/react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import ProtectedRoute from './ProtectedRoute';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <ChakraProvider>
-      <Filmtalk/>
+    <BrowserRouter>
+      <Navbar />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route
+            path="/Filmtalk"
+            element={
+              <ProtectedRoute>
+                <Filmtalk />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      
+    </BrowserRouter>
     </ChakraProvider>
   </React.StrictMode>
 );

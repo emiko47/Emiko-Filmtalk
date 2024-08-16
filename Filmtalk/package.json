@@ -12,6 +12,7 @@
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4",
     "@chakra-ui/react": "^2.0.0",
+    "@chakra-ui/icons": "^2.0.0",
     "@emotion/react": "^11.0.0",
     "@emotion/styled": "^11.0.0",
     "framer-motion": "^6.0.0"

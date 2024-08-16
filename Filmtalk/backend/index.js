@@ -3,10 +3,12 @@ import { login } from './services/login.js';
 import { verify } from './services/verify.js';
 import { addtowatchlist } from './services/addtowatchlist.js';
 import { removefromwatchlist } from './services/removefromwatchlist.js';
-import { verifyonwatchlist } from './services/verifyonwatchlist.js';
+import { getAllCards } from './services/getAllCards.js';
 import { retrieveComments } from './services/retrieveComments.js';
 import { saveComment } from './services/saveComment.js';
+import { addNewCard } from './services/addNewCard.js';
 import { buildResponse } from './utils/util.js';
+
 
 
 const healthPath='/health';
@@ -15,9 +17,10 @@ const loginPath='/login';
 const verifyPath='/verify';
 const addtowatchlistPath='/addtowatchlist';
 const removefromwatchlistPath='/removefromwatchlist';
-const verifyonwatchlistPath='verifyonwatchlist';
+const getAllCardsPath='/getAllCards';
 const retrieveCommentsPath='/retrieveComments';
 const saveCommentPath='/saveComment';
+const addNewCardPath='/addNewCard';
 
 
 
@@ -36,13 +39,17 @@ export const handler = async (event) => {
       const addtowatchlistBody = JSON.parse(event.body);//we will receive a body from the frontend containing the addtowatchlist details
       response = await addtowatchlist(addtowatchlistBody);
       break;
+    case event.httpMethod === 'POST' && event.path === addNewCardPath:
+      const addNewCardBody = JSON.parse(event.body);//we will receive a body from the frontend containing the addtowatchlist details
+      response = await addNewCard(addNewCardBody);
+      break;
     case event.httpMethod === 'POST' && event.path === removefromwatchlistPath:
       const removefromwatchlistBody = JSON.parse(event.body);//we will receive a body from the frontend containing the addtowatchlist details
       response = await removefromwatchlist(removefromwatchlistBody);
       break;
-    case event.httpMethod === 'POST' && event.path === verifyonwatchlistPath:
-      const verifyonwatchlistBody = JSON.parse(event.body);//we will receive a body from the frontend containing the addtowatchlist details
-      response = await verifyonwatchlist(verifyonwatchlistBody);
+    case event.httpMethod === 'POST' && event.path === getAllCardsPath:
+      const getAllCardsBody = JSON.parse(event.body);//we will receive a body from the frontend containing the addtowatchlist details
+      response = await getAllCards(getAllCardsBody);
       break;
     case event.httpMethod === 'POST' && event.path === retrieveCommentsPath:
       const retrieveCommentsBody = JSON.parse(event.body);//we will receive a body from the frontend containing the addtowatchlist details

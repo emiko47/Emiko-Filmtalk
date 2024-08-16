@@ -10,7 +10,7 @@ function generateToken(userInfo) {
     const token = sign(
         { username: userInfo.username, email: userInfo.email },
         process.env.JWT_SECRET,
-        { expiresIn: '1h' }
+        { expiresIn: '1h' } 
     );
     return token;
 }

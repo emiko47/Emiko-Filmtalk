@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import './index.css';
-import { ChakraProvider, Input, Select, Button, Alert, AlertIcon, AlertTitle, Box, useDisclosure, Spinner, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, useToast } from '@chakra-ui/react';
+import { ChakraProvider, IconButton, Input, Select, Button, Alert,AlertIcon, AlertTitle, Box, useDisclosure, Spinner, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, useToast } from '@chakra-ui/react';
+import { CheckIcon} from '@chakra-ui/icons'
 
 function Filmtalk() {
-    const { isOpen, onOpen, onClose } = useDisclosure();
+    const { isOpen: isAddOpen, onOpen: onAddOpen, onClose: onAddClose } = useDisclosure();
+    const { isOpen: isEnlargedOpen, onOpen: onEnlargedOpen, onClose: onEnlargedClose } = useDisclosure();
+    const [selectedCard, setSelectedCard] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [movieCards, setMovieCards] = useState([]);
     const [displayedCards, setDisplayedCards] = useState([]);
@@ -14,6 +17,13 @@ function Filmtalk() {
         genre2: '',
         img: '',
         about: ''
+    });
+    const [comments, setComments] = useState([]);
+    const [commentDetails, setCommentDetails] = useState({
+        user: '',
+        time: '',
+        comment: ''
+        
     });
     const [error, setError] = useState(null);
     const [selectedFilter, setSelectedFilter] = useState('None');
@@ -51,7 +61,7 @@ function Filmtalk() {
 
         setMovieCards([...movieCards, newCard]);
         setDisplayedCards([...movieCards, newCard]);
-        onClose();
+        onAddClose();
         toast({
             title: 'Success',
             description: 'Your Recommendation has been added',
@@ -126,9 +136,12 @@ function Filmtalk() {
         setDisplayedCards(filteredCards);
     };
 
-    const enlargeCard = (name, imgsrc, year, about, genre1, genre2 ) =>{
+    const enlargeCard = (card) => {
+        setSelectedCard(card);
+        onEnlargedOpen();
 
     };
+    
 
     return (
         <ChakraProvider>
@@ -173,12 +186,12 @@ function Filmtalk() {
                                 <option value='Documentary/Docuseries'>Documentary/Docuseries</option>
                                 <option value='None'>None</option>
                             </Select>
-                            <Button id='addrec' colorScheme='rgb(62, 176, 246);' onClick={onOpen}>+ Add</Button>
+                            <Button id='addrec' colorScheme='rgb(62, 176, 246);' onClick={onAddOpen}>+ Add</Button>
                         </div>
                     </div>
                     <div className='cardbox'>
                         {displayedCards.map(card => (
-                            <div className='movie_card' onClick={enlargeCard()}key={`movie_card_${card.name}`}>
+                            <div className='movie_card' onClick={() => enlargeCard(card)}key={`movie_card_${card.name}`}>
                                 <div className='card_img'>
                                     {card.img && <img className='new_img' src={card.img} alt={card.name} />}
                                 </div>
@@ -193,7 +206,7 @@ function Filmtalk() {
                 </div>
 
                 {/* Modal */}
-                <Modal id='movie_entry' isOpen={isOpen} onClose={onClose}>
+                <Modal id='movie_entry' isOpen={isAddOpen} onClose={onAddClose}>
                     <ModalOverlay />
                     <ModalContent>
                         <ModalHeader>Add a Movie Recommendation</ModalHeader>
@@ -249,7 +262,7 @@ function Filmtalk() {
                             )}
                         </ModalBody>
                         <ModalFooter>
-                            <Button colorScheme='rgb(2, 2, 100);' mr={3} onClick={onClose}>
+                            <Button colorScheme='rgb(2, 2, 100);' mr={3} onClick={onAddClose}>
                                 Close
                             </Button>
                             <Button
@@ -261,6 +274,51 @@ function Filmtalk() {
                                 spinner={<Spinner size="sm" />}
                             >
                                 Submit
+                            </Button>
+                        </ModalFooter>
+                    </ModalContent>
+                </Modal>
+                {/* Enlarged Card Modal */}
+                <Modal className='enlargedCard' isOpen={isEnlargedOpen} onClose={onEnlargedClose} size='lg'>
+                    <ModalOverlay />
+                    <ModalContent bg="rgb(46, 44, 44)" color="white">
+                        <ModalHeader textAlign="center">{selectedCard?.name}</ModalHeader>
+                        <ModalCloseButton />
+                        <ModalBody display="flex" flexDirection="column" alignItems="center" marginLeft="5%" marginRight="5%" height="fit-content" overflow-y="scroll">
+                            <div className="en-content"></div>
+                            <div className='card_img'>
+                                {selectedCard?.img && <img className='new_img' src={selectedCard.img} alt={selectedCard.name} />}
+                            </div>
+                            <Button id='addwatchlist' colorScheme='rgb(62, 176, 246);'>+</Button>
+                            <Button id='remwatchlist' colorScheme='rgb(62, 176, 246);'>-</Button>
+                            <div className='en_card_rightside'>
+                                
+                                <p className='en_card_yearandgenre'><b>
+                                    {selectedCard?.year} &nbsp;|&nbsp;
+                                    {[selectedCard?.genre1, selectedCard?.genre2].filter(Boolean).join(', ')}
+                                    </b></p>
+                                <div className='en-deets'>{selectedCard?.about}</div>
+                            </div>
+                            <div className='comment-section'>
+                                <p id="com-title">Comments</p>
+                                <div id="en-hr"/>
+                                <div className='comment-box'>
+                                
+                                </div>
+                                <div className="add-comm">
+                                <Input id='comm' focusBorderColor='rgb(62, 176, 246)' placeholder='Add a comment...' width="90%"/>
+                                <IconButton
+                                colorScheme='blue'
+                                aria-label='comment-submit'
+                                icon={<CheckIcon />}
+                                />
+                                </div>
+                            </div>
+                        </ModalBody>
+                            
+                        <ModalFooter>
+                            <Button colorScheme='blue' mr={3} onClick={onEnlargedClose}>
+                                Close
                             </Button>
                         </ModalFooter>
                     </ModalContent>

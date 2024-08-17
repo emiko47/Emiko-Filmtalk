@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import './index.css';
 import { ChakraProvider, IconButton, Input, Select, Button, Alert,AlertIcon, AlertTitle, Box, useDisclosure, Spinner, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, useToast } from '@chakra-ui/react';
 import { CheckIcon} from '@chakra-ui/icons'
+import { getUser } from './AuthServices';
 
 function Filmtalk() {
     const { isOpen: isAddOpen, onOpen: onAddOpen, onClose: onAddClose } = useDisclosure();
@@ -30,9 +31,10 @@ function Filmtalk() {
     const [searchQuery, setSearchQuery] = useState('');
     const toast = useToast();
 
-    const handleSubmit = () => {
+    const handleSubmit = async (e) => {
+        e.preventDefault();//this will prevent the page from reloading (the default behaviour when a form is submitted)
         const { name, year, genre1, genre2, img, about } = movieDetails;
-
+    //what we'll do is first send the new card to the backend then getAll the cards and display them so we have everything in the cardbox
         // Validate Name
         if (!name.trim()) {
             setError('Please enter a name');
@@ -48,27 +50,72 @@ function Filmtalk() {
 
         // Clear error
         setError(null);
-
-        // Create new card
-        const newCard = {
-            name,
-            year,
-            genre1,
-            genre2,
-            img,
-            about
+        const usery = sessionStorage.getItem('user')
+        // Create new card and send to backend
+        const movieDetails_tobeSent = {
+            movie_name: name,
+            genre1: genre1,
+            genre2: genre2,
+            year: year,
+            img_src: img,
+            about: about,
+            username: usery // assuming currentUser is available in the session storage
         };
-
-        setMovieCards([...movieCards, newCard]);
-        setDisplayedCards([...movieCards, newCard]);
-        onAddClose();
-        toast({
-            title: 'Success',
-            description: 'Your Recommendation has been added',
-            status: 'success',
-            duration: 3000,
-            isClosable: true,
+        try{
+        const response = await fetch(process.env.REACT_APP_ADDNEWCARD_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-api-key': process.env.REACT_APP_API_TOKEN, },
+            body: JSON.stringify(movieDetails)
         });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            console.log('Movie card added:', data);
+            // Handle success (e.g., update UI)
+            onAddClose();//modal is closed here and success toast is displayed
+            toast({
+                title: 'Success',
+                description: 'Your Recommendation has been added',
+                status: 'success',
+                duration: 3000,
+                isClosable: true,
+            });
+
+        } else {
+            console.error('Error adding movie card:', data.message);
+            setError('Error adding this title');
+        }} catch (error) {
+            console.log('An error occurred. Please try again.');
+          }
+
+          //call get all cards here before settingMovieCard
+        try{
+            const responsetwo = await fetch(process.env.REACT_APP_GETALLCARDS_URL, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json', 'x-api-key': process.env.REACT_APP_API_TOKEN },
+                body: ''
+            });
+
+            const datatwo = await responsetwo.json();
+        
+            if (responsetwo.ok) {
+                console.log('Movie cards retrieved');
+                // Update the state with the retrieved movie cards
+                setMovieCards(datatwo);
+                setDisplayedCards(datatwo); 
+    
+            } else{
+                console.error('Error retrieving movie card');
+                setError('Error retrieving movie cards :-(');
+            }
+        
+        } catch (error) {
+                console.log('An error occurred. Please try again.');
+              }
+        
+        //setMovieCards([...movieCards, newCard]);
+        //setDisplayedCards([...movieCards, newCard]);
 
         // Reset movie details
         setMovieDetails({

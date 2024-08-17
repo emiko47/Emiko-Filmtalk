@@ -47,7 +47,7 @@ export const handler = async (event) => {
       const removefromwatchlistBody = JSON.parse(event.body);//we will receive a body from the frontend containing the addtowatchlist details
       response = await removefromwatchlist(removefromwatchlistBody);
       break;
-    case event.httpMethod === 'POST' && event.path === getAllCardsPath:
+    case event.httpMethod === 'GET' && event.path === getAllCardsPath:
       const getAllCardsBody = JSON.parse(event.body);//we will receive a body from the frontend containing the addtowatchlist details
       response = await getAllCards(getAllCardsBody);
       break;

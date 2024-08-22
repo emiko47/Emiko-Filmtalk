@@ -31,51 +31,47 @@ const addNewCardPath='/addNewCard';
 export const handler = async (event) => {
   console.log('Request event: ', event);
   let response;
-  switch(true){
+  switch(true) {
     case event.httpMethod === 'GET' && event.path === healthPath:
       response = buildResponse(200);
       break;
     case event.httpMethod === 'POST' && event.path === addtowatchlistPath:
-      const addtowatchlistBody = JSON.parse(event.body);//we will receive a body from the frontend containing the addtowatchlist details
+      const addtowatchlistBody = JSON.parse(event.body);
       response = await addtowatchlist(addtowatchlistBody);
       break;
     case event.httpMethod === 'POST' && event.path === addNewCardPath:
-      const addNewCardBody = JSON.parse(event.body);//we will receive a body from the frontend containing the addtowatchlist details
+      const addNewCardBody = JSON.parse(event.body);
       response = await addNewCard(addNewCardBody);
       break;
     case event.httpMethod === 'POST' && event.path === removefromwatchlistPath:
-      const removefromwatchlistBody = JSON.parse(event.body);//we will receive a body from the frontend containing the addtowatchlist details
+      const removefromwatchlistBody = JSON.parse(event.body);
       response = await removefromwatchlist(removefromwatchlistBody);
       break;
     case event.httpMethod === 'GET' && event.path === getAllCardsPath:
-      const getAllCardsBody = JSON.parse(event.body);//we will receive a body from the frontend containing the addtowatchlist details
-      response = await getAllCards(getAllCardsBody);
+      response = await getAllCards();
       break;
     case event.httpMethod === 'POST' && event.path === retrieveCommentsPath:
-      const retrieveCommentsBody = JSON.parse(event.body);//we will receive a body from the frontend containing the addtowatchlist details
+      const retrieveCommentsBody = JSON.parse(event.body);
       response = await retrieveComments(retrieveCommentsBody);
       break;
     case event.httpMethod === 'POST' && event.path === saveCommentPath:
-        const saveCommentBody = JSON.parse(event.body);//we will receive a body from the frontend containing the addtowatchlist details
-        response = await saveComment(saveCommentBody);
-        break;
+      const saveCommentBody = JSON.parse(event.body);
+      response = await saveComment(saveCommentBody);
+      break;
     case event.httpMethod === 'POST' && event.path === registerPath:
-        const registerBody = JSON.parse(event.body);//we will receive a body from the frontend containing the registration details
-      response = await register(registerBody);//use await to make it an asynchronous function since DynamoDB will be handling the actual registration.
+      const registerBody = JSON.parse(event.body);
+      response = await register(registerBody);
       break;
     case event.httpMethod === 'POST' && event.path === loginPath:
-        const loginBody = JSON.parse(event.body);//we will receive a body from the frontend containing the login details
-        response = await login(loginBody);//use await to make it an asynchronous function since DynamoDB will be handling the actual registration.
-        break;
+      const loginBody = JSON.parse(event.body);
+      response = await login(loginBody);
+      break;
     case event.httpMethod === 'POST' && event.path === verifyPath:
-        const verifyBody = JSON.parse(event.body);
-        response = verify(verifyBody);//use this to verify the token to see if it is expired or valid
-        break;
+      const verifyBody = JSON.parse(event.body);
+      response = await verify(verifyBody);
+      break;
     default:
-     response = buildResponse(404, '404 Not Found')
-     
-     
+      response = buildResponse(404, '404 Not Found');
   }
   return response;
 };
-

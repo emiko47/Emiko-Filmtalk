@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import './index.css';
 import { ChakraProvider, IconButton, Input, Select, Button, Alert,AlertIcon, AlertTitle, Box, useDisclosure, Spinner, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, useToast } from '@chakra-ui/react';
 import { CheckIcon} from '@chakra-ui/icons'
 import { getUser } from './AuthServices';
 
 function Filmtalk() {
+    const usery = getUser().username//sessionStorage.getItem('user')
+    console.log(usery)
     const { isOpen: isAddOpen, onOpen: onAddOpen, onClose: onAddClose } = useDisclosure();
     const { isOpen: isEnlargedOpen, onOpen: onEnlargedOpen, onClose: onEnlargedClose } = useDisclosure();
     const [selectedCard, setSelectedCard] = useState(null);
@@ -12,31 +14,162 @@ function Filmtalk() {
     const [movieCards, setMovieCards] = useState([]);
     const [displayedCards, setDisplayedCards] = useState([]);
     const [movieDetails, setMovieDetails] = useState({
-        name: '',
+        movie_name: '',
         year: '',
         genre1: '',
         genre2: '',
-        img: '',
+        img_src: '',
         about: ''
     });
     const [comments, setComments] = useState([]);
-    const [commentDetails, setCommentDetails] = useState({
-        user: '',
-        time: '',
-        comment: ''
-        
-    });
+    const [currentComment, setCurrentComment] = useState("")
     const [error, setError] = useState(null);
     const [selectedFilter, setSelectedFilter] = useState('None');
     const [searchQuery, setSearchQuery] = useState('');
     const toast = useToast();
 
+    useEffect(() => {
+        getAllTheCards(); // Fetch movie cards on mount
+    }, []);
+   
+
+    async function retrieveAllTheComments(card_id) {
+        console.log('The card id is:', card_id)
+        const pack = {card_id: card_id};
+
+        try {
+            const response = await fetch(`${process.env.REACT_APP_RETRIEVECOMMENTS_URL}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'x-api-key': process.env.REACT_APP_API_TOKEN },
+                body: JSON.stringify(pack)
+            });
+            
+    
+            const data = await response.json();
+    
+            if (response.ok) {
+                console.log('Comments retrieved for this card:', data);
+    
+                // Parse the response to extract comment details
+                const parsedComments = data.L.map(item => ({
+                    comment: item.M.comment.S,
+                    username: item.M.username.S,
+                    time: item.M.time.S
+                }));
+    
+                // Store the parsed comments in the state
+                setComments(parsedComments);
+            } else if (response.status === 500) {
+                console.warn('Failed to retrieve comments:', data.message);
+                toast({
+                    title: 'Warning',
+                    description: 'Failed to retrieve comments :-(',
+                    status: 'warning',
+                    duration: 3000,
+                    isClosable: true,
+                });
+            }
+        } catch (error) {
+            console.log('An error retrieving the comments occurred. Please try again.');
+        }
+    }
+    
+
+
+    const handleCommentChange = (e) =>{
+        setCurrentComment(e.target.value);
+        console.log(currentComment);
+    }
+
+    async function handleSubmitComment (currentUser, card_id) {
+        if (!currentComment.trim()){
+            toast({
+                title: 'Empty Comment',
+                description: 'Please enter a comment',
+                status: 'error',
+                duration: 3000,
+                isClosable: true,
+            });
+        } else{
+            
+            const pack = {
+                username: currentUser,
+                card_id: card_id,
+                comment: currentComment
+            }
+            try{
+                
+                const response = await fetch(process.env.REACT_APP_SAVECOMMENT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'x-api-key': process.env.REACT_APP_API_TOKEN },
+                    body: JSON.stringify(pack)
+                });
+    
+                const data = await response.json();
+        
+                if (response.ok) {
+                    retrieveAllTheComments(card_id)
+                    setCurrentComment('');
+                    console.log('Added Comment:', data);
+                    
+                    toast({
+                        title: 'Added',
+                        description: 'Your thoughts have been added!',
+                        status: 'success',
+                        duration: 3000,
+                        isClosable: true,
+                    });
+                }
+                else if (response.status === 500) {
+                    console.warn('Failed to add comment:', data.message);
+                    toast({
+                        title: 'Warning',
+                        description: 'Failed to add comment',
+                        status: 'warning',
+                        duration: 3000,
+                        isClosable: true,
+                    });}
+            }
+            catch (error){
+                console.log('An error getting submitting cards occurred. Please try again.');
+            }
+        }
+    }
+
+    async function getAllTheCards (){
+        try{
+            const response = await fetch(process.env.REACT_APP_GETALLCARDS_URL, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json', 'x-api-key': process.env.REACT_APP_API_TOKEN },
+            });
+
+            const data = await response.json();
+    
+            if (response.ok) {
+                console.log('Movie cards retrieved:', data);
+                
+                // Update the state with the retrieved movie cards
+                setMovieCards(data);
+                setDisplayedCards(data); 
+
+            } else{
+                console.error('Error retrieving movie card:', data.message);
+                setError('Error retrieving movie cards :-(');
+            }
+        
+        } catch (error) {
+                console.log('An error getting cards occurred. Please try again.');
+            }
+
+    }
+        
+
     const handleSubmit = async (e) => {
         e.preventDefault();//this will prevent the page from reloading (the default behaviour when a form is submitted)
-        const { name, year, genre1, genre2, img, about } = movieDetails;
+        const { movie_name, year, genre1, genre2, img_src, about } = movieDetails;
     //what we'll do is first send the new card to the backend then getAll the cards and display them so we have everything in the cardbox
         // Validate Name
-        if (!name.trim()) {
+        if (!movie_name.trim()) {
             setError('Please enter a name');
             return;
         }
@@ -50,14 +183,15 @@ function Filmtalk() {
 
         // Clear error
         setError(null);
-        const usery = sessionStorage.getItem('user')
+        
+        
         // Create new card and send to backend
         const movieDetails_tobeSent = {
-            movie_name: name,
+            movie_name: movie_name,
             genre1: genre1,
             genre2: genre2,
             year: year,
-            img_src: img,
+            img_src: img_src,
             about: about,
             username: usery // assuming currentUser is available in the session storage
         };
@@ -65,7 +199,7 @@ function Filmtalk() {
         const response = await fetch(process.env.REACT_APP_ADDNEWCARD_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'x-api-key': process.env.REACT_APP_API_TOKEN, },
-            body: JSON.stringify(movieDetails)
+            body: JSON.stringify(movieDetails_tobeSent)
         });
 
         const data = await response.json();
@@ -81,6 +215,7 @@ function Filmtalk() {
                 duration: 3000,
                 isClosable: true,
             });
+            getAllTheCards();
 
         } else {
             console.error('Error adding movie card:', data.message);
@@ -88,31 +223,8 @@ function Filmtalk() {
         }} catch (error) {
             console.log('An error occurred. Please try again.');
           }
-
-          //call get all cards here before settingMovieCard
-        try{
-            const responsetwo = await fetch(process.env.REACT_APP_GETALLCARDS_URL, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json', 'x-api-key': process.env.REACT_APP_API_TOKEN },
-                body: ''
-            });
-
-            const datatwo = await responsetwo.json();
-        
-            if (responsetwo.ok) {
-                console.log('Movie cards retrieved');
-                // Update the state with the retrieved movie cards
-                setMovieCards(datatwo);
-                setDisplayedCards(datatwo); 
-    
-            } else{
-                console.error('Error retrieving movie card');
-                setError('Error retrieving movie cards :-(');
-            }
-        
-        } catch (error) {
-                console.log('An error occurred. Please try again.');
-              }
+         
+         //call get all cards here before settingMovieCard
         
         //setMovieCards([...movieCards, newCard]);
         //setDisplayedCards([...movieCards, newCard]);
@@ -160,19 +272,8 @@ function Filmtalk() {
     const handleFilter = (filter) => {
         let filteredCards = [...movieCards];
         if (filter !== 'None') {
-            if (filter.startsWith('Sort:')) {
-                if (filter === 'Sort: A-Z') {
-                    filteredCards.sort((a, b) => a.name.localeCompare(b.name));
-                } else if (filter === 'Sort: Z-A') {
-                    filteredCards.sort((a, b) => b.name.localeCompare(a.name));
-                } else if (filter === 'Year Released:E-L') {
-                    filteredCards.sort((a, b) => a.year - b.year);
-                } else if (filter === 'Year Released:L-E') {
-                    filteredCards.sort((a, b) => b.year - a.year);
-                }
-            } else {
+        
                 filteredCards = movieCards.filter(card => card.genre1 === filter || card.genre2 === filter);
-            }
         }
         // Apply the search query filter
         if (searchQuery !== '') {
@@ -186,10 +287,98 @@ function Filmtalk() {
     const enlargeCard = (card) => {
         setSelectedCard(card);
         onEnlargedOpen();
-
+        retrieveAllTheComments(card.card_id);
     };
     
+    async function addCardToWatchlist (currentuser, card_id){
+        const pack = {
+            username: currentuser,
+            card_id: card_id
+        }
+        setError(null);
+        try{
+            const response = await fetch(process.env.REACT_APP_ADDTOWATCHLIST_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'x-api-key': process.env.REACT_APP_API_TOKEN },
+                body: JSON.stringify(pack)
+            });
 
+            const data = await response.json();
+    
+            if (response.ok) {
+                console.log('Title was added to your watchlist:', data);
+                toast({
+                    title: 'Success',
+                    description: 'Title has been added to your watchlist',
+                    status: 'success',
+                    duration: 3000,
+                    isClosable: true,
+                });
+
+            }
+            else if (response.status === 401) {
+                console.warn('This title is already in your watchlist:', data.message);
+                toast({
+                    title: 'Warning',
+                    description: 'This title is already in your watchlist',
+                    status: 'warning',
+                    duration: 3000,
+                    isClosable: true,
+                });}
+
+             else{
+                console.error('Error adding to watchlist:', data.message);
+                setError('Error adding to watchlist :-(');
+            }
+        
+        } catch (error) {
+                console.log('An error adding the card occured. Please try again.');
+            }
+    }
+
+    async function removeCardFromWatchlist(currentuser, card_id) {
+        const pack = {
+            username: currentuser,
+            card_id: card_id
+        };
+        setError(null);
+        try {
+            const response = await fetch(process.env.REACT_APP_REMOVEFROMWATCHLIST_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'x-api-key': process.env.REACT_APP_API_TOKEN },
+                body: JSON.stringify(pack)
+            });
+    
+            const data = await response.json();
+    
+            if (response.ok) {
+                console.log('Title was removed from your watchlist:', data);
+                toast({
+                    title: 'Success',
+                    description: 'Title has been removed from your watchlist',
+                    status: 'success',
+                    duration: 3000,
+                    isClosable: true,
+                });
+            } else if (response.status === 401) {
+                console.warn('This title is not in your watchlist:', data.message);
+                toast({
+                    title: 'Warning',
+                    description: 'This title is not in your watchlist',
+                    status: 'warning',
+                    duration: 3000,
+                    isClosable: true,
+                });
+            } else {
+                console.error('Error removing from watchlist:', data.message);
+                setError('Error removing from watchlist :-(');
+            }
+        } catch (error) {
+            console.log('An error removing the card occurred. Please try again.');
+            setError('An unexpected error occurred :-(');
+        }
+    }
+    
     return (
         <ChakraProvider>
             <section className='fullbody'>
@@ -217,11 +406,7 @@ function Filmtalk() {
                         <div className="rightside">
                             <p>Filter:</p>
                             &nbsp;
-                            <Select iconSize='14px' id='filter' placeholder='None' onChange={handleFilterChange}>
-                                <option value='Sort: A-Z'>Sort: A-Z</option>
-                                <option value='Sort: Z-A'>Sort: Z-A</option>
-                                <option value='Year Released:E-L'>Year Released (Earliest to Latest)</option>
-                                <option value='Year Released:L-E'>Year Released (Latest to Earliest)</option>
+                            <Select iconSize='14px' id='filter' placeholder='-' onChange={handleFilterChange}>
                                 <option value='Romance'>Romance</option>
                                 <option value='Thriller'>Thriller</option>
                                 <option value='Action'>Action</option>
@@ -238,12 +423,12 @@ function Filmtalk() {
                     </div>
                     <div className='cardbox'>
                         {displayedCards.map(card => (
-                            <div className='movie_card' onClick={() => enlargeCard(card)}key={`movie_card_${card.name}`}>
+                            <div className='movie_card' onClick={() => enlargeCard(card)}key={`movie_card_${card.card_id}`}>
                                 <div className='card_img'>
-                                    {card.img && <img className='new_img' src={card.img} alt={card.name} />}
+                                    {card.img_src && <img className='new_img' src={card.img_src} alt={card.name} />}
                                 </div>
                                 <div className='card_rightside'>
-                                    <p className='card_title'>{card.name}</p>
+                                    <p className='card_title'>{card.movie_name}</p>
                                     <p className='card_yearandgenre'>{card.year}&nbsp;|&nbsp;{[card.genre1, card.genre2].filter(Boolean).join(', ')}</p>
                                     <div className='deets'>{card.about}</div>
                                 </div>
@@ -261,7 +446,7 @@ function Filmtalk() {
                         <ModalBody>
                             
                                 <Box id='movname'>
-                                    Name:<Input id='name' focusBorderColor='rgb(62, 176, 246)' placeholder='e.g. Transformers' value={movieDetails.name} onChange={handleChange} />
+                                    Name:<Input id='movie_name' focusBorderColor='rgb(62, 176, 246)' placeholder='e.g. Transformers' value={movieDetails.movie_name} onChange={handleChange} />
                                 </Box>
                                 <Box id='movyear'>
                                     Release Year:<Input id='year' focusBorderColor='rgb(62, 176, 246)' placeholder='e.g. 1996' value={movieDetails.year} onChange={handleChange} />
@@ -295,7 +480,7 @@ function Filmtalk() {
                                     </Select>
                                 </Box>
                                 <Box id='movimg'>
-                                    Image link (Optional):<Input id='img' focusBorderColor='rgb(62, 176, 246)' placeholder='' value={movieDetails.img} onChange={handleChange} />
+                                    Image link (Optional):<Input id='img_src' focusBorderColor='rgb(62, 176, 246)' placeholder='' value={movieDetails.img_src} onChange={handleChange} />
                                 </Box>
                                 <Box id='movabout'>
                                     About:<Input id='about' focusBorderColor='rgb(62, 176, 246)' placeholder='e.g. Tell us about the movie...' value={movieDetails.about} onChange={handleChange} />
@@ -329,15 +514,15 @@ function Filmtalk() {
                 <Modal className='enlargedCard' isOpen={isEnlargedOpen} onClose={onEnlargedClose} size='lg'>
                     <ModalOverlay />
                     <ModalContent bg="rgb(46, 44, 44)" color="white">
-                        <ModalHeader textAlign="center">{selectedCard?.name}</ModalHeader>
+                        <ModalHeader textAlign="center">{selectedCard?.movie_name}</ModalHeader>
                         <ModalCloseButton />
                         <ModalBody display="flex" flexDirection="column" alignItems="center" marginLeft="5%" marginRight="5%" height="fit-content" overflow-y="scroll">
                             <div className="en-content"></div>
                             <div className='card_img'>
-                                {selectedCard?.img && <img className='new_img' src={selectedCard.img} alt={selectedCard.name} />}
+                                {selectedCard?.img_src && <img className='new_img' src={selectedCard.img_src} alt={selectedCard.name} />}
                             </div>
-                            <Button id='addwatchlist' colorScheme='rgb(62, 176, 246);'>+</Button>
-                            <Button id='remwatchlist' colorScheme='rgb(62, 176, 246);'>-</Button>
+                            <Button onClick={() => addCardToWatchlist(usery,selectedCard?.card_id)} id='addwatchlist' colorScheme='rgb(62, 176, 246);'>+</Button>
+                            <Button onClick={() => removeCardFromWatchlist(usery,selectedCard?.card_id)} id='remwatchlist' colorScheme='rgb(62, 176, 246);'>-</Button>
                             <div className='en_card_rightside'>
                                 
                                 <p className='en_card_yearandgenre'><b>
@@ -350,13 +535,26 @@ function Filmtalk() {
                                 <p id="com-title">Comments</p>
                                 <div id="en-hr"/>
                                 <div className='comment-box'>
-                                
+                                    {comments.map((comment, index) => (
+                                        <div className='whole_comment' key={index}>
+                                            <div className='prof_icon'></div>
+                                            <div className='comment_rightside'>
+                                                <div className='comm_top'>
+                                                    <p>{comment.username}</p>
+                                                    <p>{comment.time}</p>
+                                                </div>
+                                                <div className='comm_bottom'>{comment.comment}</div>
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
+
                                 <div className="add-comm">
-                                <Input id='comm' focusBorderColor='rgb(62, 176, 246)' placeholder='Add a comment...' width="90%"/>
+                                <Input id='comm' value={currentComment} onChange={handleCommentChange} focusBorderColor='rgb(62, 176, 246)' placeholder='Add a comment...' width="90%"/>
                                 <IconButton
                                 colorScheme='blue'
                                 aria-label='comment-submit'
+                                onClick={() => handleSubmitComment(usery, selectedCard?.card_id)}
                                 icon={<CheckIcon />}
                                 />
                                 </div>

@@ -17,7 +17,7 @@ async function addNewCard(event) {
         TableName: 'MovieCards',
         Item: {
             card_id: { S: card_id },
-            movie_name: { S: movie_name || 'Unknown' },
+            movie_name: { S: movie_name || 'UnknownName' },
             genre1: { S: genre1 || 'Unknown' },
             genre2: { S: genre2 || 'Unknown' },
             year: { S: year || 'Unknown' },
@@ -32,11 +32,21 @@ async function addNewCard(event) {
     try {
         await ddbClient.send(new PutItemCommand(params));
         return {
+            headers: {
+                "Access-Control-Allow-Origin": "*", 
+                "Access-Control-Allow-Headers": "Content-Type",
+                "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+              },
             statusCode: 201,
             body: JSON.stringify({ message: 'Movie card created successfully', card_id: card_id })
         };
     } catch (error) {
         return {
+            headers: {
+                "Access-Control-Allow-Origin": "*", 
+                "Access-Control-Allow-Headers": "Content-Type",
+                "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+              },
             statusCode: 500,
             body: JSON.stringify({ message: 'Failed to create movie card', error: error.message })
         };

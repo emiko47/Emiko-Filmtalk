@@ -1,35 +1,61 @@
-import { DynamoDBClient} from '@aws-sdk/client-dynamodb';
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import { UpdateItemCommand } from '@aws-sdk/client-dynamodb';
+
 const ddbClient = new DynamoDBClient({ region: 'us-east-2' });
 
-async function addtowatchlist (event) {
-    const { username, movie_name } = JSON.parse(event.body);
+async function addtowatchlist(event) {
+    const username = event.username;
+    const card_id = event.card_id;
 
     const params = {
         TableName: 'MovieCards',
-        Key: { movie_name: movie_name },
-        UpdateExpression: 'SET watchlisters = list_append(if_not_exists(watchlisters, :emptyList), :username)',
-        ConditionExpression: 'not contains(watchlisters, :username)',
+        Key: { card_id: { S: card_id } },
+        UpdateExpression: 'SET watchlisters = list_append(if_not_exists(watchlisters, :emptyList), :usernameList)',
+        ConditionExpression: 'NOT contains(watchlisters, :username)',
         ExpressionAttributeValues: {
-            ':username': [username],
-            ':emptyList': []
+            ':username': { S: username }, // String value for condition check
+            ':usernameList': { L: [{ S: username }] }, // List containing the string to append
+            ':emptyList': { L: [] } // Empty list to initialize if not exists
         },
         ReturnValues: 'UPDATED_NEW'
     };
 
     try {
-        await ddbClient.update(params).promise();
+        const command = new UpdateItemCommand(params);
+        await ddbClient.send(command);
         return {
+            headers: {
+                "Access-Control-Allow-Origin": "*", 
+                "Access-Control-Allow-Headers": "Content-Type",
+                "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+              },
             statusCode: 200,
             body: JSON.stringify({ message: 'Title has been added to your watchlist' })
         };
     } catch (error) {
-        return {
-            statusCode: error.code === 'ConditionalCheckFailedException' ? 401 : 500,
-            body: JSON.stringify({ message: error.code === 'ConditionalCheckFailedException' ? 'This title is already in your watchlist' : 'Failed to add to watchlist', error: error.message })
-        };
+        if (error.name === 'ConditionalCheckFailedException') {
+            return {
+                headers: {
+                    "Access-Control-Allow-Origin": "*", 
+                    "Access-Control-Allow-Headers": "Content-Type",
+                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                  },
+                statusCode: 401,
+                body: JSON.stringify({ message: 'This title is already in your watchlist' })
+            };
+        } else {
+            return {
+                headers: {
+                    "Access-Control-Allow-Origin": "*", 
+                    "Access-Control-Allow-Headers": "Content-Type",
+                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                  },
+                statusCode: 500,
+                body: JSON.stringify({ message: 'Failed to add to watchlist', error: error.message })
+            };
+        }
     }
-};
+}
 
 const _addtowatchlist = addtowatchlist;
 export { _addtowatchlist as addtowatchlist };
-

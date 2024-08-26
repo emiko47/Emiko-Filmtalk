@@ -8,8 +8,8 @@ import { retrieveComments } from './services/retrieveComments.js';
 import { saveComment } from './services/saveComment.js';
 import { addNewCard } from './services/addNewCard.js';
 import { buildResponse } from './utils/util.js';
-
-
+import { addLike } from './services/addLike.js';
+import { addDislike } from './services/addDislike.js';
 
 const healthPath='/health';
 const registerPath='/register';
@@ -21,7 +21,8 @@ const getAllCardsPath='/getAllCards';
 const retrieveCommentsPath='/retrieveComments';
 const saveCommentPath='/saveComment';
 const addNewCardPath='/addNewCard';
-
+const addLikePath='/addLike';
+const addDislikePath='/addDislike';
 
 
 //Remember this is the root lambda function that is triggered by the API we created.
@@ -69,6 +70,14 @@ export const handler = async (event) => {
     case event.httpMethod === 'POST' && event.path === verifyPath:
       const verifyBody = JSON.parse(event.body);
       response = await verify(verifyBody);
+      break;
+    case event.httpMethod === 'POST' && event.path === addLikePath:
+      const addLikeBody = JSON.parse(event.body);
+      response = await addLike(addLikeBody);
+      break;
+    case event.httpMethod === 'POST' && event.path === addDislikePath:
+      const addDislikeBody = JSON.parse(event.body);
+      response = await addDislike(addDislikeBody);
       break;
     default:
       response = buildResponse(404, '404 Not Found');

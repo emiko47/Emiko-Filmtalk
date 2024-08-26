@@ -25,7 +25,11 @@ async function addNewCard(event) {
             about: { S: about || 'No description' },
             username: { S: username || 'Anonymous' },
             watchlisters: { L: [] },  // Assuming watchlisters is a list
-            comments: { L: [] }       // Assuming comments is a list
+            comments: { L: [] },       // Assuming comments is a list
+            likers: {L: []},
+            like_no: {N: '0'},
+            dislikers: {L: []},
+            dislike_no: {N: '0'}
         }
     };
 

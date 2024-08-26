@@ -82,7 +82,7 @@ function Filmtalk() {
     }
 
     async function handleSubmitComment (currentUser, card_id) {
-        if (!currentComment.trim()){
+        if (typeof currentComment === 'string' && !currentComment.trim()){
             toast({
                 title: 'Empty Comment',
                 description: 'Please enter a comment',
@@ -149,7 +149,7 @@ function Filmtalk() {
                 console.log('Movie cards retrieved:', data);
                 
                 // Update the state with the retrieved movie cards
-                setMovieCards(data);
+                setMovieCards(data.map(card => ({ ...card, watchlist: card.watchlist || [] })));
                 setDisplayedCards(data); 
 
             } else{
@@ -169,7 +169,7 @@ function Filmtalk() {
         const { movie_name, year, genre1, genre2, img_src, about } = movieDetails;
     //what we'll do is first send the new card to the backend then getAll the cards and display them so we have everything in the cardbox
         // Validate Name
-        if (!movie_name.trim()) {
+        if (typeof movie_name === 'string' && !movie_name.trim()) {
             setError('Please enter a name');
             return;
         }
@@ -231,7 +231,7 @@ function Filmtalk() {
 
         // Reset movie details
         setMovieDetails({
-            name: '',
+            movie_name: '',
             year: '',
             genre1: '',
             genre2: '',
@@ -248,11 +248,12 @@ function Filmtalk() {
             setDisplayedCards(movieCards);
         } else {
             const filteredCards = movieCards.filter(card =>
-                card.name.toLowerCase().includes(query)
+                card.movie_name && card.movie_name.toLowerCase().includes(query)
             );
             setDisplayedCards(filteredCards);
         }
     };
+    
 
     // Here we use handleChange to dynamically update each field in the movieDetails useState
     const handleChange = (e) => {
@@ -270,19 +271,24 @@ function Filmtalk() {
     };
 
     const handleFilter = (filter) => {
-        let filteredCards = [...movieCards];
-        if (filter !== 'None') {
         
-                filteredCards = movieCards.filter(card => card.genre1 === filter || card.genre2 === filter);
+        let filteredCards = [...movieCards];
+        if (filter === 'Your Watchlist') {
+    
+            filteredCards = movieCards.filter(movie => movie.watchlisters && movie.watchlisters.includes(getUser().username));
+            console.log('watchlist items', filteredCards)
+        } else if (filter !== 'None') {
+            filteredCards = movieCards.filter(card => card.genre1 === filter || card.genre2 === filter);
         }
-        // Apply the search query filter
+        
         if (searchQuery !== '') {
             filteredCards = filteredCards.filter(card =>
-                card.name.toLowerCase().includes(searchQuery)
+                card.movie_name.toLowerCase().includes(searchQuery)
             );
         }
         setDisplayedCards(filteredCards);
     };
+    
 
     const enlargeCard = (card) => {
         setSelectedCard(card);
@@ -306,6 +312,7 @@ function Filmtalk() {
             const data = await response.json();
     
             if (response.ok) {
+                getAllTheCards();
                 console.log('Title was added to your watchlist:', data);
                 toast({
                     title: 'Success',
@@ -352,6 +359,7 @@ function Filmtalk() {
             const data = await response.json();
     
             if (response.ok) {
+                getAllTheCards();
                 console.log('Title was removed from your watchlist:', data);
                 toast({
                     title: 'Success',
@@ -406,7 +414,9 @@ function Filmtalk() {
                         <div className="rightside">
                             <p>Filter:</p>
                             &nbsp;
-                            <Select iconSize='14px' id='filter' placeholder='-' onChange={handleFilterChange}>
+                            <Select iconSize='14px' id='filter' placeholder='' onChange={handleFilterChange}>
+                                <option value='None'>None</option>
+                                <option value='Your Watchlist'>Your Watchlist</option>
                                 <option value='Romance'>Romance</option>
                                 <option value='Thriller'>Thriller</option>
                                 <option value='Action'>Action</option>
@@ -416,22 +426,27 @@ function Filmtalk() {
                                 <option value='Anime'>Anime</option>
                                 <option value='Fantasy'>Fantasy</option>
                                 <option value='Documentary/Docuseries'>Documentary/Docuseries</option>
-                                <option value='None'>None</option>
+                                <option value='Psychological Thrillers'>Psychological Thrillers</option>
+                               
                             </Select>
                             <Button id='addrec' colorScheme='rgb(62, 176, 246);' onClick={onAddOpen}>+ Add</Button>
                         </div>
                     </div>
                     <div className='cardbox'>
                         {displayedCards.map(card => (
+                            <div className='card_cont'>
+                                 
                             <div className='movie_card' onClick={() => enlargeCard(card)}key={`movie_card_${card.card_id}`}>
+                           
                                 <div className='card_img'>
                                     {card.img_src && <img className='new_img' src={card.img_src} alt={card.name} />}
                                 </div>
                                 <div className='card_rightside'>
-                                    <p className='card_title'>{card.movie_name}</p>
+                                <p className='card_title'>{card.movie_name}</p>
                                     <p className='card_yearandgenre'>{card.year}&nbsp;|&nbsp;{[card.genre1, card.genre2].filter(Boolean).join(', ')}</p>
                                     <div className='deets'>{card.about}</div>
                                 </div>
+                            </div>
                             </div>
                         ))}
                     </div>
@@ -518,6 +533,7 @@ function Filmtalk() {
                         <ModalCloseButton />
                         <ModalBody display="flex" flexDirection="column" alignItems="center" marginLeft="5%" marginRight="5%" height="fit-content" overflow-y="scroll">
                             <div className="en-content"></div>
+                            <p className="uploadedBy" alignItems="end" textAlign='end'>Review by {selectedCard?.username}</p>
                             <div className='card_img'>
                                 {selectedCard?.img_src && <img className='new_img' src={selectedCard.img_src} alt={selectedCard.name} />}
                             </div>

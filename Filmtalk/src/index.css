@@ -147,9 +147,16 @@ code {
   flex-wrap: wrap;
 }
 
+.card_cont{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .movie_card{
   display: flex;
   flex-direction: row;
+  align-items: center;
   width: 350px;
   height: 200px;
   background-color: rgb(46, 44, 44);
@@ -164,13 +171,14 @@ code {
 
 .card_img{
   width: 150px;
+  margin-top: 10px;
 }
 
 .new_img{
   width: 100%;
-  height: 150px;
+  height: 170px;
   margin-left: 5px;
-  margin-top: 5px;
+  margin-bottom: 5px;
 }
 
 .card_rightside{
@@ -237,4 +245,35 @@ code {
 
 .en-content{
   overflow:scroll
+}
+
+
+
+.fullpage{
+  background-color: rgb(2, 11, 96);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: white;
+}
+
+.home_title{
+  margin-top: 80px;
+  font-size: 120px;
+  color: rgb(62, 176, 246);
+}
+
+.home_info{
+  display: flex;
+  flex: wrap;
+  width: 75vw;
+  align-items: center;
+  flex-direction: column;
+  text-align: center;
+  color: white;
+}
+
+.form-toggle{
+  margin-top: 40px;
 }

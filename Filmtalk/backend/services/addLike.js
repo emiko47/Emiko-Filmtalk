@@ -30,7 +30,20 @@ async function addLike(event) {
         const likeNo = item?.like_no?.N || '0';
         const dislikeNo = item?.dislike_no?.N || '0';
 
-        // Step 2: Prepare update parameters
+        // Step 2: Check if the username is already in the likers list
+        if (currentLikers.includes(username)) {
+            return {
+                headers: {
+                    "Access-Control-Allow-Origin": "*", 
+                    "Access-Control-Allow-Headers": "Content-Type",
+                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                },
+                statusCode: 200,
+                body: JSON.stringify({ message: 'Title is already in your likes' })
+            };
+        }
+
+        // Step 3: Prepare update parameters if username is not already in the likers list
         const updateParams = {
             TableName: 'MovieCards',
             Key: { card_id: { S: card_id } },
@@ -40,7 +53,6 @@ async function addLike(event) {
                     #dislikers = :updatedDislikersList,
                     #dislike_no = :newDislikeNo
             `,
-            ConditionExpression: 'NOT contains(#likers, :username)',
             ExpressionAttributeNames: {
                 '#likers': 'likers',
                 '#like_no': 'like_no',
@@ -48,7 +60,6 @@ async function addLike(event) {
                 '#dislike_no': 'dislike_no'
             },
             ExpressionAttributeValues: {
-                ':username': { L: [{ S: username }] },
                 ':usernameList': { L: [{ S: username }] },
                 ':emptyList': { L: [] },
                 ':newLikeNo': { N: (parseInt(likeNo) + 1).toString() },
@@ -58,7 +69,7 @@ async function addLike(event) {
             ReturnValues: 'UPDATED_NEW'
         };
 
-        // Step 3: Perform the update
+        // Step 4: Perform the update
         const updateCommand = new UpdateItemCommand(updateParams);
         await ddbClient.send(updateCommand);
 

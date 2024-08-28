@@ -4,9 +4,10 @@ import { UpdateItemCommand, GetItemCommand } from '@aws-sdk/client-dynamodb';
 const ddbClient = new DynamoDBClient({ region: 'us-east-2' });
 
 async function addDislike(event) {
-    const { username, card_id } = JSON.parse(event.body);
+    const username = event.username;
+    const card_id = event.card_id;
 
-    // Parameters to retrieve the current item
+    // Step 1: Retrieve the current item to check current lists
     const getParams = {
         TableName: 'MovieCards',
         Key: { card_id: { S: card_id } },
@@ -20,18 +21,29 @@ async function addDislike(event) {
     };
 
     try {
-        // Retrieve the current item
         const getCommand = new GetItemCommand(getParams);
         const getResult = await ddbClient.send(getCommand);
         const item = getResult.Item;
 
-        // Extract current values or initialize
         const currentLikers = item?.likers?.L?.map(el => el.S) || [];
         const currentDislikers = item?.dislikers?.L?.map(el => el.S) || [];
         const likeNo = item?.like_no?.N || '0';
         const dislikeNo = item?.dislike_no?.N || '0';
 
-        // Parameters to update the item
+        // Step 2: Check if the username is already in the dislikers list
+        if (currentDislikers.includes(username)) {
+            return {
+                headers: {
+                    "Access-Control-Allow-Origin": "*", 
+                    "Access-Control-Allow-Headers": "Content-Type",
+                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                },
+                statusCode: 200,
+                body: JSON.stringify({ message: 'Title is already in your dislikes' })
+            };
+        }
+
+        // Step 3: Prepare update parameters if username is not already in the dislikers list
         const updateParams = {
             TableName: 'MovieCards',
             Key: { card_id: { S: card_id } },
@@ -41,7 +53,6 @@ async function addDislike(event) {
                     #likers = :updatedLikersList,
                     #like_no = :newLikeNo
             `,
-            ConditionExpression: 'NOT contains(#dislikers, :username)',
             ExpressionAttributeNames: {
                 '#likers': 'likers',
                 '#like_no': 'like_no',
@@ -49,7 +60,6 @@ async function addDislike(event) {
                 '#dislike_no': 'dislike_no'
             },
             ExpressionAttributeValues: {
-                ':username': { L: [{ S: username }] },
                 ':usernameList': { L: [{ S: username }] },
                 ':emptyList': { L: [] },
                 ':newDislikeNo': { N: (parseInt(dislikeNo) + 1).toString() },
@@ -59,7 +69,7 @@ async function addDislike(event) {
             ReturnValues: 'UPDATED_NEW'
         };
 
-        // Execute the update command
+        // Step 4: Execute the update command
         const updateCommand = new UpdateItemCommand(updateParams);
         await ddbClient.send(updateCommand);
 

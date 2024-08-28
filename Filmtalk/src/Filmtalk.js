@@ -3,6 +3,10 @@ import './index.css';
 import { ChakraProvider, IconButton, Input, Select, Button, Alert,AlertIcon, AlertTitle, Box, useDisclosure, Spinner, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, useToast } from '@chakra-ui/react';
 import { CheckIcon} from '@chakra-ui/icons'
 import { getUser } from './AuthServices';
+import ic1 from './movie-with-students-audience-svgrepo-com.svg'
+import { Avatar, AvatarBadge, AvatarGroup } from '@chakra-ui/react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faThumbsUp } from '@fortawesome/free-solid-svg-icons';
 
 function Filmtalk() {
     const usery = getUser().username//sessionStorage.getItem('user')
@@ -391,13 +395,13 @@ function Filmtalk() {
         <ChakraProvider>
             <section className='fullbody'>
                 <nav className='navig'>
-                    FilmTalk
+                    <img id='ico1'src={ic1}></img>
+                    &nbsp;
+                    <b>FilmTalk</b>
                     <p className='tag'>by Emiko</p>
                 </nav>
                 <div className='intro'>
-                    <p id='p1'>Hi All!</p>
-                    <p id='p2'>Welcome to FilmTalk, a film blog site I've built from scratch with React, Javascript, Terraform and AWS Services. I am a film enthusiast and I mostly enjoy dialogue driven dramas that really focus on exploring the human condition. I decided to make this site so I can share my thoughts and opinions with everyone, and let people share their thoughts on these films as well. I hope this site finds individuals who are as interested in film as I am.</p>
-                    <p id='p3'>Enjoy!</p>
+                <Avatar name={usery} src='https://bit.ly/broken-link' />
                 </div>
 
                 <div className='moviebox'>
@@ -405,13 +409,13 @@ function Filmtalk() {
                         <div id='search'>
                             <Input
                                 id='searchbar'
-                                focusBorderColor='rgb(62, 176, 246)'
-                                placeholder='Search Movies...'
+                                focusBorderColor='blue'
+                                placeholder='Search Titles...'
                                 value={searchQuery}
                                 onChange={handleSearch}
                             />
                         </div>
-                        <div className="rightside">
+                        <div className="filt_top">
                             <p>Filter:</p>
                             &nbsp;
                             <Select iconSize='14px' id='filter' placeholder='' onChange={handleFilterChange}>
@@ -429,8 +433,11 @@ function Filmtalk() {
                                 <option value='Psychological Thrillers'>Psychological Thrillers</option>
                                
                             </Select>
-                            <Button id='addrec' colorScheme='rgb(62, 176, 246);' onClick={onAddOpen}>+ Add</Button>
-                        </div>
+                            </div>
+                            <div className='addtop'>
+                            <Button id='addrec' colorScheme='rgb(8, 114, 181);' onClick={onAddOpen}>+ Add</Button>
+                            </div>
+                        
                     </div>
                     <div className='cardbox'>
                         {displayedCards.map(card => (
@@ -528,7 +535,7 @@ function Filmtalk() {
                 {/* Enlarged Card Modal */}
                 <Modal className='enlargedCard' isOpen={isEnlargedOpen} onClose={onEnlargedClose} size='lg'>
                     <ModalOverlay />
-                    <ModalContent bg="rgb(46, 44, 44)" color="white">
+                    <ModalContent bg="rgb(46, 44, 44)" color="white" overflowY='scroll' width='85vw' maxHeight='80vh'>
                         <ModalHeader textAlign="center">{selectedCard?.movie_name}</ModalHeader>
                         <ModalCloseButton />
                         <ModalBody display="flex" flexDirection="column" alignItems="center" marginLeft="5%" marginRight="5%" height="fit-content" overflow-y="scroll">
@@ -537,8 +544,14 @@ function Filmtalk() {
                             <div className='card_img'>
                                 {selectedCard?.img_src && <img className='new_img' src={selectedCard.img_src} alt={selectedCard.name} />}
                             </div>
-                            <Button onClick={() => addCardToWatchlist(usery,selectedCard?.card_id)} id='addwatchlist' colorScheme='rgb(62, 176, 246);'>+</Button>
-                            <Button onClick={() => removeCardFromWatchlist(usery,selectedCard?.card_id)} id='remwatchlist' colorScheme='rgb(62, 176, 246);'>-</Button>
+                            <div className='watchlist_sec'>
+                                <p>Watchlist</p>
+                                <div className='watchlist_buttons'>
+                                <Button  size='sm' marginRight='2px' onClick={() => addCardToWatchlist(usery,selectedCard?.card_id)} id='addwatchlist' colorScheme='rgb(62, 176, 246);'>+</Button>
+                                <Button size='sm' marginLeft='2px'onClick={() => removeCardFromWatchlist(usery,selectedCard?.card_id)} id='remwatchlist' colorScheme='rgb(62, 176, 246);'>-</Button>
+                                <FontAwesomeIcon icon="fa-solid fa-thumbs-up" style={{color: "#74C0FC",}} />
+                                </div>
+                            </div>
                             <div className='en_card_rightside'>
                                 
                                 <p className='en_card_yearandgenre'><b>
@@ -553,10 +566,10 @@ function Filmtalk() {
                                 <div className='comment-box'>
                                     {comments.map((comment, index) => (
                                         <div className='whole_comment' key={index}>
-                                            <div className='prof_icon'></div>
+                                            <div className='prof_icon'><Avatar size='sm'name={comment.username} src='https://bit.ly/broken-link' /></div>
                                             <div className='comment_rightside'>
                                                 <div className='comm_top'>
-                                                    <p>{comment.username}</p>
+                                                    <p><b>@{comment.username}</b></p>&nbsp;
                                                     <p>{comment.time}</p>
                                                 </div>
                                                 <div className='comm_bottom'>{comment.comment}</div>

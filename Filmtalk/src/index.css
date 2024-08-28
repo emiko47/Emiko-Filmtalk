@@ -34,13 +34,14 @@ code {
 .navig{
   height: 100px;
   width: 100vw;
-  background-color: rgb(62, 176, 246);
+  background-color:rgb(46, 44, 44);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 50px;
   border-color: rgb(62, 176, 246);
   border-style:groove;
+  color:rgb(62, 176, 246);
 }
 
 .tag{
@@ -85,16 +86,15 @@ code {
   height: 30px;
   align-items: center;
   justify-content: center;
-  margin-top: 10px; 
-  margin-left: 10px;
+  
   width: 250px;
   flex: 2;
   
 }
 
 .moviebox{
-  width: 75vw;
-  border-color: rgb(62, 176, 246);
+  width: 100vw;
+  border-color: rgb(8, 114, 181);
   border-style: groove;
   border-width: 10px;
   background-color: black;
@@ -111,8 +111,17 @@ code {
   flex-direction: row;
   border-bottom:rgb(62, 176, 246);
   border-style: groove;
-  height: 50px;
+  height: 80px;
   width: 100%;
+  justify-content: space-evenly;
+  align-items: center;
+  font-size: 20px;
+}
+
+.filt_top{
+  width: fit-content;
+  display: flex;
+  flex-direction: row;
 }
 
 .rightside{
@@ -134,10 +143,6 @@ code {
 }
 
 
-.card_rightside{
-  display: flex;
-  flex-direction: column;
-}
 
 .cardbox{
   display: flex;
@@ -145,6 +150,8 @@ code {
   overflow:scroll;
   margin-top: 5px;
   flex-wrap: wrap;
+  width: 100%;
+  justify-content: space-evenly;
 }
 
 .card_cont{
@@ -153,25 +160,39 @@ code {
   align-items: center;
 }
 
+#ico1{
+  
+  height: 50px;
+}
+
 .movie_card{
   display: flex;
   flex-direction: row;
   align-items: center;
   width: 350px;
-  height: 200px;
+  height: 220px;
   background-color: rgb(46, 44, 44);
   color: white;
   transition: border 0.3s ease;
   border: 5px solid black;
+  justify-content: space-between;
+  border-radius: 15px;
+  margin-top: 5px;
+  margin-bottom: 5px;
 }
 .movie_card:hover{
   border: 5px solid rgb(62, 176, 246);
   cursor: pointer;
 }
 
+#addrec:hover{
+  border: 2px solid rgb(62, 176, 246);
+}
+
 .card_img{
   width: 150px;
   margin-top: 10px;
+  margin-left: 10px;
 }
 
 .new_img{
@@ -179,17 +200,23 @@ code {
   height: 170px;
   margin-left: 5px;
   margin-bottom: 5px;
+  border: 1px solid black;
 }
 
 .card_rightside{
   display: flex;
   flex-direction: column;
-  
+  width: 150px;
+  overflow-x: hidden;
+  overflow-y: hidden;
   align-items: center;
+  margin-right: 10px;
+  text-align: center;
 }
 
 .card_title{
   font-size: 20px;
+  overflow-x: hidden;
 }
 
 .card_yearandgenre{
@@ -201,6 +228,25 @@ code {
   width: 150px;
   overflow: hidden;
   font-size: 12px;
+  text-align: left;
+}
+
+.watchlist_sec{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.watchlist_buttons{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.b_watch{
+  height: 8px;
+  width: 8px;
 }
 
 .comment-section{
@@ -213,9 +259,25 @@ code {
 .comment-box{
   display: flex;
   flex-direction: column;
-  height: fit-content;
-  overflow:scroll;
+  max-height: 300px;
+  overflow-y:scroll;
   margin-top: 10px;
+}
+
+.whole_comment{
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 10px;
+}
+
+.comment_rightside{
+  margin-left: 5px;
+}
+
+.comm_top{
+  display: flex;
+  flex-direction: row;
 }
 
 .en-deets{

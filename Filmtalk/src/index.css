@@ -33,15 +33,31 @@ code {
 
 .navig{
   height: 100px;
-  width: 100vw;
+  width: fit-content;
   background-color:rgb(46, 44, 44);
   display: flex;
+  flex-direction: row;
   align-items: center;
-  justify-content: center;
+  text-align: center;
   font-size: 50px;
   border-color: rgb(62, 176, 246);
   border-style:groove;
   color:rgb(62, 176, 246);
+  margin-left: 30px;
+}
+
+.top_help{
+  height: 100px;
+  width: 100vw;
+  background-color:rgb(46, 44, 44);
+  display: flex;
+  align-items: center;
+  display:flex;
+  flex-direction: column;
+  font-size: 50px;
+  border-color: rgb(62, 176, 246);
+  border-style:groove;
+  color:rgb(27, 167, 255);
 }
 
 .tag{
@@ -58,6 +74,18 @@ code {
   width: 70vw;
   font-weight: bold;
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 #p1{
   margin-top: 30px;
@@ -162,15 +190,34 @@ code {
 
 #ico1{
   
-  height: 50px;
+  height: 60px;
+}
+
+.extra_help{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 350px;
+  margin-top: 5px;
+  margin-bottom: 25px;
+  height: 100%;
+}
+
+.d_owner{
+  font-size: 10px;
+  width: 90%;
+  text-align: center;
+  margin-top: 10px;
+
 }
 
 .movie_card{
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: center;
   width: 350px;
-  height: 220px;
+  height: 230px;
   background-color: rgb(46, 44, 44);
   color: white;
   transition: border 0.3s ease;
@@ -236,17 +283,65 @@ code {
   flex-direction: column;
   align-items: center;
   text-align: center;
+  margin-right: 20px;
 }
 
 .watchlist_buttons{
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  
+}
+
+#mid_divider{
+  width:1px;
+  height: 80px;
+  background-color: white;
+  
 }
 
 .b_watch{
   height: 8px;
   width: 8px;
+}
+
+.en_mid{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.like_box{
+  margin-left: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#thumbsup{
+  margin-right: 5px;
+}
+
+#thumbsup:hover{
+  cursor: pointer;
+}
+
+#thumbsdown{
+  margin-right: 5px;
+}
+
+#thumbsdown:hover{
+  cursor:pointer;
+}
+
+#thumbsupe{
+  margin-right:10px;
+}
+
+.like_buttons{
+  display: flex;
+  flex-direction: row;
 }
 
 .comment-section{
@@ -280,9 +375,18 @@ code {
   flex-direction: row;
 }
 
+#comm{
+  margin-right: 5px;
+}
+
+#plane:hover{
+ cursor: pointer;
+}
+
 .en-deets{
   width: 100%;
   margin-top: 20px;
+  text-align: left;
 }
 
 .add-com{
@@ -293,12 +397,14 @@ code {
 
 #en-hr{
   width: 100%;
-  height: 2px;
+  height: 1px;
   background-color: white;
 }
 
 .en_card_rightside{
   margin-top: 10px;
+  text-align: left;
+  width: 100%;
 }
 
 .en_card_yearandgenre{

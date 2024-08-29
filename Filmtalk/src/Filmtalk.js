@@ -1,14 +1,30 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useRef } from "react";
 import './index.css';
 import { ChakraProvider, IconButton, Input, Select, Button, Alert,AlertIcon, AlertTitle, Box, useDisclosure, Spinner, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, useToast } from '@chakra-ui/react';
-import { CheckIcon} from '@chakra-ui/icons'
+import { CheckIcon, ChevronDownIcon} from '@chakra-ui/icons'
 import { getUser } from './AuthServices';
 import ic1 from './movie-with-students-audience-svgrepo-com.svg'
 import { Avatar, AvatarBadge, AvatarGroup } from '@chakra-ui/react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faThumbsUp } from '@fortawesome/free-solid-svg-icons';
+import { faThumbsDown, faThumbsUp, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
+import Rating from '@mui/material/Rating';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+
+import {
+    Menu,
+    MenuButton,
+    MenuList,
+    MenuItem,
+    MenuItemOption,
+    MenuGroup,
+    MenuOptionGroup,
+    MenuDivider,
+} from '@chakra-ui/react'
+
 
 function Filmtalk() {
+    const theme = createTheme();
     const usery = getUser().username//sessionStorage.getItem('user')
     console.log(usery)
     const { isOpen: isAddOpen, onOpen: onAddOpen, onClose: onAddClose } = useDisclosure();
@@ -23,7 +39,8 @@ function Filmtalk() {
         genre1: '',
         genre2: '',
         img_src: '',
-        about: ''
+        about: '',
+        rating: ''
     });
     const [comments, setComments] = useState([]);
     const [currentComment, setCurrentComment] = useState("")
@@ -31,11 +48,96 @@ function Filmtalk() {
     const [selectedFilter, setSelectedFilter] = useState('None');
     const [searchQuery, setSearchQuery] = useState('');
     const toast = useToast();
+    
 
     useEffect(() => {
         getAllTheCards(); // Fetch movie cards on mount
     }, []);
    
+
+
+    async function handleLike (username, card_id) {
+        const pack = {card_id: card_id, username: username}
+
+        try {
+            const response = await fetch(`${process.env.REACT_APP_ADDLIKE_URL}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'x-api-key': process.env.REACT_APP_API_TOKEN },
+                body: JSON.stringify(pack)
+            });
+            
+    
+            const data = await response.json();
+    
+            if (response.ok) {
+                console.log('Liked Successfully', data);
+                toast({
+                    title: 'You liked this title',
+                    description: '',
+                    status: 'success',
+                    duration: 3000,
+                    isClosable: true,
+                });
+              
+    
+               
+            } else if (response.status === 500) {
+                console.warn('Failed to like', data.message);
+                toast({
+                    title: 'Warning',
+                    description: 'Could not like this title :-(',
+                    status: 'warning',
+                    duration: 3000,
+                    isClosable: true,
+                });
+            }
+        } catch (error) {
+            console.log('An error liking this title. Please try again.');
+        }
+
+    }
+
+    async function handleDislike (username, card_id) {
+        const pack = {card_id: card_id, username: username}
+
+        try {
+            const response = await fetch(`${process.env.REACT_APP_ADDDISLIKE_URL}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'x-api-key': process.env.REACT_APP_API_TOKEN },
+                body: JSON.stringify(pack)
+            });
+            
+    
+            const data = await response.json();
+    
+            if (response.ok) {
+                console.log('Thumbs Down Successful', data);
+                toast({
+                    title: 'Thumbs Down Successful',
+                    description: 'Do not forget to share your thoughts!',
+                    status: 'success',
+                    duration: 3000,
+                    isClosable: true,
+                });
+              
+    
+               
+            } else if (response.status === 500) {
+                console.warn('Failed to like', data.message);
+                toast({
+                    title: 'Warning',
+                    description: 'Could not like this title :-(',
+                    status: 'warning',
+                    duration: 3000,
+                    isClosable: true,
+                });
+            }
+        } catch (error) {
+            console.log('An error liking this title. Please try again.');
+        }
+
+    }
+
 
     async function retrieveAllTheComments(card_id) {
         console.log('The card id is:', card_id)
@@ -170,7 +272,7 @@ function Filmtalk() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();//this will prevent the page from reloading (the default behaviour when a form is submitted)
-        const { movie_name, year, genre1, genre2, img_src, about } = movieDetails;
+        const { movie_name, year, genre1, genre2, img_src, about, rating } = movieDetails;
     //what we'll do is first send the new card to the backend then getAll the cards and display them so we have everything in the cardbox
         // Validate Name
         if (typeof movie_name === 'string' && !movie_name.trim()) {
@@ -188,7 +290,7 @@ function Filmtalk() {
         // Clear error
         setError(null);
         
-        
+        console.log(movieDetails.rating);
         // Create new card and send to backend
         const movieDetails_tobeSent = {
             movie_name: movie_name,
@@ -197,6 +299,7 @@ function Filmtalk() {
             year: year,
             img_src: img_src,
             about: about,
+            rating: rating,
             username: usery // assuming currentUser is available in the session storage
         };
         try{
@@ -394,14 +497,15 @@ function Filmtalk() {
     return (
         <ChakraProvider>
             <section className='fullbody'>
-                <nav className='navig'>
+                <div className='top_help'><nav className='navig'>
                     <img id='ico1'src={ic1}></img>
-                    &nbsp;
+                    
                     <b>FilmTalk</b>
-                    <p className='tag'>by Emiko</p>
-                </nav>
+                    <p className='tag'>by Ebuka Emiko</p>
+                </nav></div>
                 <div className='intro'>
-                <Avatar name={usery} src='https://bit.ly/broken-link' />
+                <div className='intro_left'></div>
+                
                 </div>
 
                 <div className='moviebox'>
@@ -418,6 +522,18 @@ function Filmtalk() {
                         <div className="filt_top">
                             <p>Filter:</p>
                             &nbsp;
+                            <Menu>
+                                <MenuButton size='lg'as={'d_menu'} rightIcon={<ChevronDownIcon />}>
+                                    Browse
+                                </MenuButton>
+                                <MenuList color='white' backgroundColor='gray'>
+                                    <MenuItem color='white' backgroundColor='gray'>Download</MenuItem>
+                                    <MenuItem color='white' backgroundColor='gray'>Create a Copy</MenuItem>
+                                    <MenuItem color='white' backgroundColor='gray'>Mark as Draft</MenuItem>
+                                    <MenuItem color='white' backgroundColor='gray'>Delete</MenuItem>
+                                    <MenuItem color='white' backgroundColor='gray'>Attend a Workshop</MenuItem>
+                                </MenuList>
+                                </Menu>
                             <Select iconSize='14px' id='filter' placeholder='' onChange={handleFilterChange}>
                                 <option value='None'>None</option>
                                 <option value='Your Watchlist'>Your Watchlist</option>
@@ -444,15 +560,17 @@ function Filmtalk() {
                             <div className='card_cont'>
                                  
                             <div className='movie_card' onClick={() => enlargeCard(card)}key={`movie_card_${card.card_id}`}>
-                           
-                                <div className='card_img'>
+                            <p className='d_owner'><Avatar size='2xs'name={card.username} src='https://bit.ly/broken-link' />&nbsp;<b>{card.username}</b></p>
+                                <div className='extra_help'><div className='card_img'>
                                     {card.img_src && <img className='new_img' src={card.img_src} alt={card.name} />}
                                 </div>
                                 <div className='card_rightside'>
-                                <p className='card_title'>{card.movie_name}</p>
+                                    <p className='card_title'><b>{card.movie_name}</b></p>
+                                    <ThemeProvider theme={theme}><CssBaseline /><Rating name="read-only" value={card.rating || 0} readOnly /></ThemeProvider>
                                     <p className='card_yearandgenre'>{card.year}&nbsp;|&nbsp;{[card.genre1, card.genre2].filter(Boolean).join(', ')}</p>
                                     <div className='deets'>{card.about}</div>
-                                </div>
+                                </div></div>
+                                
                             </div>
                             </div>
                         ))}
@@ -507,6 +625,17 @@ function Filmtalk() {
                                 <Box id='movabout'>
                                     About:<Input id='about' focusBorderColor='rgb(62, 176, 246)' placeholder='e.g. Tell us about the movie...' value={movieDetails.about} onChange={handleChange} />
                                 </Box>
+                                <Box>
+                                    Rating: 
+                                    <Select id='rating' iconSize='20px' className='rating'  value={movieDetails.rating} onChange={handleChange}>
+                                        <option value='0'>0 stars</option>
+                                        <option value='1'>1 star</option>
+                                        <option value='2'>2 stars</option>
+                                        <option value='3'>3 stars</option>
+                                        <option value='4'>4 stars</option>
+                                        <option value='5'>5 stars</option>
+                                    </Select>
+                                </Box>
                         
                             {error && (
                                 <Alert status='error' mt={4}>
@@ -544,26 +673,37 @@ function Filmtalk() {
                             <div className='card_img'>
                                 {selectedCard?.img_src && <img className='new_img' src={selectedCard.img_src} alt={selectedCard.name} />}
                             </div>
+                            <p className='en_card_yearandgenre'><b>
+                                    {selectedCard?.year} &nbsp;|&nbsp;
+                                    {[selectedCard?.genre1, selectedCard?.genre2].filter(Boolean).join(', ')}
+                                    </b></p>
+                            <div className='en_mid'>
                             <div className='watchlist_sec'>
                                 <p>Watchlist</p>
                                 <div className='watchlist_buttons'>
                                 <Button  size='sm' marginRight='2px' onClick={() => addCardToWatchlist(usery,selectedCard?.card_id)} id='addwatchlist' colorScheme='rgb(62, 176, 246);'>+</Button>
                                 <Button size='sm' marginLeft='2px'onClick={() => removeCardFromWatchlist(usery,selectedCard?.card_id)} id='remwatchlist' colorScheme='rgb(62, 176, 246);'>-</Button>
-                                <FontAwesomeIcon icon="fa-solid fa-thumbs-up" style={{color: "#74C0FC",}} />
                                 </div>
+                            </div>
+                            <div id='mid_divider'></div>
+                            <div className='like_box'>
+                                <p>Like</p>
+                                <div className='like_buttons'>
+                                <FontAwesomeIcon onClick={() => handleLike(usery, selectedCard?.card_id)}id='thumbsup' icon={faThumbsUp} size="2xl" style={{ color: 'rgb(62, 176, 246)' }} /><p id='thumbsupe'>{selectedCard?.like_no}</p>
+                                
+                                <FontAwesomeIcon onClick={() => handleDislike(usery, selectedCard?.card_id)} id='thumbsdown' icon={faThumbsDown} size="2xl" style={{ color: 'rgb(62, 176, 246)' }} /><p id='thumbsdowne'>{selectedCard?.dislike_no}</p>
+                                </div>
+                            </div>
                             </div>
                             <div className='en_card_rightside'>
                                 
-                                <p className='en_card_yearandgenre'><b>
-                                    {selectedCard?.year} &nbsp;|&nbsp;
-                                    {[selectedCard?.genre1, selectedCard?.genre2].filter(Boolean).join(', ')}
-                                    </b></p>
-                                <div className='en-deets'>{selectedCard?.about}</div>
+                               
+                                <p className='en-deets'>{selectedCard?.about}</p>
                             </div>
                             <div className='comment-section'>
-                                <p id="com-title">Comments</p>
+                                <p id="com-title">{selectedCard?.comments?.length} Comments</p>
                                 <div id="en-hr"/>
-                                <div className='comment-box'>
+                                <div  className='comment-box'>
                                     {comments.map((comment, index) => (
                                         <div className='whole_comment' key={index}>
                                             <div className='prof_icon'><Avatar size='sm'name={comment.username} src='https://bit.ly/broken-link' /></div>
@@ -580,12 +720,8 @@ function Filmtalk() {
 
                                 <div className="add-comm">
                                 <Input id='comm' value={currentComment} onChange={handleCommentChange} focusBorderColor='rgb(62, 176, 246)' placeholder='Add a comment...' width="90%"/>
-                                <IconButton
-                                colorScheme='blue'
-                                aria-label='comment-submit'
-                                onClick={() => handleSubmitComment(usery, selectedCard?.card_id)}
-                                icon={<CheckIcon />}
-                                />
+                                <FontAwesomeIcon id='plane' beatFade onClick={() => handleSubmitComment(usery, selectedCard?.card_id)} icon={faPaperPlane} size='xl' style={{color: "#74C0FC",}} />
+                               
                                 </div>
                             </div>
                         </ModalBody>

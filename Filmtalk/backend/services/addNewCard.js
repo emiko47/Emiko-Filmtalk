@@ -10,6 +10,7 @@ async function addNewCard(event) {
     const img_src = event.img_src;
     const about = event.about;
     const username = event.username;
+    const rating = event.rating;
 
     const card_id = uuidv4();
 
@@ -22,6 +23,7 @@ async function addNewCard(event) {
             genre2: { S: genre2 || 'Unknown' },
             year: { S: year || 'Unknown' },
             img_src: { S: img_src || 'N/A' },
+            rating: {N: rating || '0'},
             about: { S: about || 'No description' },
             username: { S: username || 'Anonymous' },
             watchlisters: { L: [] },  // Assuming watchlisters is a list

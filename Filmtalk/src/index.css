@@ -189,17 +189,16 @@ code {
 }
 
 #ico1{
-  
   height: 60px;
 }
 
 .extra_help{
   display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items: start;
   justify-content: space-between;
   width: 350px;
-  margin-top: 5px;
+  margin-top: 10px;
   margin-bottom: 25px;
   height: 100%;
 }
@@ -237,9 +236,12 @@ code {
 }
 
 .card_img{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   width: 150px;
-  margin-top: 10px;
   margin-left: 10px;
+  margin-top: 0;
 }
 
 .new_img{

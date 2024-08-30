@@ -684,3 +684,91 @@ code {
   height: 30px;
 }
 
+/*Media Queries */
+@media only screen and (max-width: 430px) {
+  .form_container{
+    width: 70vw;
+  }
+
+  #ico1{
+    height: 40px;
+  }
+
+  .navig{
+    font-size: 40px;
+  }
+
+  .tag{
+    font-size: 10px;
+  }
+
+  .featuress_top{
+    font-size: 25px;
+
+  }
+
+  .feat_text{
+    font-size: 15px;
+  }
+
+  .navig_support{
+    flex-direction: column-reverse;
+    height: fit-content;
+  }
+  
+  .main_controls{
+    width: 100%;
+    height: 200px;
+    flex-direction: column;
+    align-items: start;
+    justify-content: space-evenly;
+    margin-left: 20px;
+  }
+
+  .user_andinfo{
+    width: 100%;
+    align-items: center;
+    justify-content: space-evenly;
+  }
+
+
+  .movie_card{
+    display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 250px;
+  height: 390px;
+  background-color: rgb(46, 44, 44);
+  color: white;
+  transition: border 0.3s ease;
+  border: 5px solid black;
+  justify-content: space-between;
+  border-radius: 15px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  }
+
+  .extra_help{
+    display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  width: 250px;
+  margin-top: 10px;
+  margin-bottom: 25px;
+  height: 100%;
+  }
+
+  .card_rightside{
+    margin-bottom: 30px;
+  }
+.card_title{
+  overflow-x: visible;
+}
+
+.d_owner{
+text-align: right;
+}
+
+  
+}

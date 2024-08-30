@@ -489,7 +489,7 @@ code {
 .comment-section{
   display: flex;
   flex-direction: column;
-  width: 80%;
+  width: 100%;
   height: fit-content;
   margin-top: 20px;
 }
@@ -520,6 +520,7 @@ code {
 
 #comm{
   margin-right: 5px;
+  width: 90%;
 }
 
 #plane:hover{
@@ -535,6 +536,7 @@ code {
 .add-com{
   display:flex;
   flex-direction: row;
+  width: 100%;
 }
 
 
@@ -759,6 +761,10 @@ code {
   height: 100%;
   }
 
+  .moviebox{
+    width: 85vw;
+  }
+
   .card_rightside{
     margin-bottom: 30px;
   }
@@ -768,6 +774,11 @@ code {
 
 .d_owner{
 text-align: right;
+}
+
+#comm{
+  margin-right: 5px;
+  width: 85%;
 }
 
   

@@ -621,7 +621,7 @@ function Filmtalk() {
                 <Modal id='movie_entry' isOpen={isAddOpen} onClose={onAddClose}>
                     <ModalOverlay />
                     <ModalContent>
-                        <ModalHeader>Add a Movie Recommendation</ModalHeader>
+                        <ModalHeader>Add a Title Review</ModalHeader>
                         <ModalCloseButton />
                         <ModalBody>
                             

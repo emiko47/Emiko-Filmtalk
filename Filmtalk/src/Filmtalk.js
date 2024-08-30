@@ -4,12 +4,16 @@ import { ChakraProvider, IconButton, Input, Select, Button, Alert,AlertIcon, Ale
 import { CheckIcon, ChevronDownIcon} from '@chakra-ui/icons'
 import { getUser } from './AuthServices';
 import ic1 from './movie-with-students-audience-svgrepo-com.svg'
+import ic2 from './user-circle-svgrepo-com.svg';
 import { Avatar, AvatarBadge, AvatarGroup } from '@chakra-ui/react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faThumbsDown, faThumbsUp, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
+import { faThumbsDown, faThumbsUp, faPaperPlane, faCircleUser, faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
 import Rating from '@mui/material/Rating';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
+import { isLoggedIn, removeUserSession } from './AuthServices';
+import { Link, useNavigate } from 'react-router-dom';
+
 
 import {
     Menu,
@@ -24,6 +28,11 @@ import {
 
 
 function Filmtalk() {
+    const navigate = useNavigate();
+    const handleLogout = () => {
+        removeUserSession(); // Remove user session
+        navigate('/'); // Redirect to the home page or login page
+      };
     const theme = createTheme();
     const usery = getUser().username//sessionStorage.getItem('user')
     console.log(usery)
@@ -503,10 +512,7 @@ function Filmtalk() {
                     <b>FilmTalk</b>
                     <p className='tag'>by Ebuka Emiko</p>
                 </nav></div>
-                <div className='intro'>
-                <div className='intro_left'></div>
                 
-                </div>
 
                 <div className='moviebox'>
                     <div className='topbar'>

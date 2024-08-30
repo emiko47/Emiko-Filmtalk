@@ -24,7 +24,7 @@ const Home = () => {
           </div>
           <div className='home_info'>
             <h2>Welcome to Filmtalk!</h2>
-            <p>FilmTalk is a film-centered social blog site I've built from scratch with React, Javascript, and AWS Services. I am a film enthusiast and I mostly enjoy "dialogue driven dramas that explore the human condition". I decided to make this site so I can share my thoughts and opinions with everyone, and let people share their thoughts on these films as well. I hope this site finds individuals who are as interested in film as I am.</p>
+            <p>FilmTalk is a social film discovery site I've built from scratch with React, Javascript, and AWS Services. I am a film enthusiast and I mostly enjoy "dialogue driven dramas that explore the human condition". I decided to make this site so I could share my thoughts and opinions with everyone, and let people share their thoughts on these films as well. I hope this site finds individuals who are as interested in film as I am.</p>
           </div>
           {!isLoggedIn() && (
             <>

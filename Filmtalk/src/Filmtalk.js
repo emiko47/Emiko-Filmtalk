@@ -13,6 +13,17 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { isLoggedIn, removeUserSession } from './AuthServices';
 import { Link, useNavigate } from 'react-router-dom';
+import {
+    Popover,
+    PopoverTrigger,
+    PopoverContent,
+    PopoverHeader,
+    PopoverBody,
+    PopoverFooter,
+    PopoverArrow,
+    PopoverCloseButton,
+    PopoverAnchor,
+  } from '@chakra-ui/react'
 
 
 import {
@@ -512,35 +523,25 @@ function Filmtalk() {
                     <b>FilmTalk</b>
                     <p className='tag'>by Ebuka Emiko</p>
                 </nav></div>
-                
-
-                <div className='moviebox'>
-                    <div className='topbar'>
+                <div className='navig_support'>
+                    <div className='main_controls'>
+                        <div className='addtop'>
+                            <Button id='addrec' colorScheme='rgb(8, 114, 181);' onClick={onAddOpen}>+ Add Review</Button>
+                        </div>
                         <div id='search'>
-                            <Input
-                                id='searchbar'
-                                focusBorderColor='blue'
-                                placeholder='Search Titles...'
-                                value={searchQuery}
-                                onChange={handleSearch}
-                            />
+                                <Input
+                                    id='searchbar'
+                                    focusBorderColor='rgb(62, 176, 246);'
+                                    placeholder='Search Titles...'
+                                    value={searchQuery}
+                                    onChange={handleSearch}
+                                />
                         </div>
                         <div className="filt_top">
                             <p>Filter:</p>
                             &nbsp;
-                            <Menu>
-                                <MenuButton size='lg'as={'d_menu'} rightIcon={<ChevronDownIcon />}>
-                                    Browse
-                                </MenuButton>
-                                <MenuList color='white' backgroundColor='gray'>
-                                    <MenuItem color='white' backgroundColor='gray'>Download</MenuItem>
-                                    <MenuItem color='white' backgroundColor='gray'>Create a Copy</MenuItem>
-                                    <MenuItem color='white' backgroundColor='gray'>Mark as Draft</MenuItem>
-                                    <MenuItem color='white' backgroundColor='gray'>Delete</MenuItem>
-                                    <MenuItem color='white' backgroundColor='gray'>Attend a Workshop</MenuItem>
-                                </MenuList>
-                                </Menu>
-                            <Select iconSize='14px' id='filter' placeholder='' onChange={handleFilterChange}>
+                            
+                            <Select iconSize='14px' id='filter' placeholder='' onChange={handleFilterChange} backgroundColor="black">
                                 <option value='None'>None</option>
                                 <option value='Your Watchlist'>Your Watchlist</option>
                                 <option value='Romance'>Romance</option>
@@ -556,11 +557,16 @@ function Filmtalk() {
                                
                             </Select>
                             </div>
-                            <div className='addtop'>
-                            <Button id='addrec' colorScheme='rgb(8, 114, 181);' onClick={onAddOpen}>+ Add</Button>
-                            </div>
-                        
+                            
                     </div>
+                    <div classname='user_andinfo'>
+
+                    </div>
+                </div>
+                
+
+                <div className='moviebox'>
+                   
                     <div className='cardbox'>
                         {displayedCards.map(card => (
                             <div className='card_cont'>

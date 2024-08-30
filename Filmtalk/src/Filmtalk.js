@@ -4,12 +4,27 @@ import { ChakraProvider, IconButton, Input, Select, Button, Alert,AlertIcon, Ale
 import { CheckIcon, ChevronDownIcon} from '@chakra-ui/icons'
 import { getUser } from './AuthServices';
 import ic1 from './movie-with-students-audience-svgrepo-com.svg'
+import ic2 from './user-circle-svgrepo-com.svg';
 import { Avatar, AvatarBadge, AvatarGroup } from '@chakra-ui/react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faThumbsDown, faThumbsUp, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
+import { faThumbsDown, faThumbsUp, faCircleInfo, faPaperPlane, faCircleUser, faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
 import Rating from '@mui/material/Rating';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
+import { isLoggedIn, removeUserSession } from './AuthServices';
+import { Link, useNavigate } from 'react-router-dom';
+import {
+    Popover,
+    PopoverTrigger,
+    PopoverContent,
+    PopoverHeader,
+    PopoverBody,
+    PopoverFooter,
+    PopoverArrow,
+    PopoverCloseButton,
+    PopoverAnchor,
+  } from '@chakra-ui/react'
+
 
 import {
     Menu,
@@ -24,6 +39,11 @@ import {
 
 
 function Filmtalk() {
+    const navigate = useNavigate();
+    const handleLogout = () => {
+        removeUserSession(); // Remove user session
+        navigate('/'); // Redirect to the home page or login page
+      };
     const theme = createTheme();
     const usery = getUser().username//sessionStorage.getItem('user')
     console.log(usery)
@@ -503,38 +523,25 @@ function Filmtalk() {
                     <b>FilmTalk</b>
                     <p className='tag'>by Ebuka Emiko</p>
                 </nav></div>
-                <div className='intro'>
-                <div className='intro_left'></div>
-                
-                </div>
-
-                <div className='moviebox'>
-                    <div className='topbar'>
+                <div className='navig_support'>
+                    <div className='main_controls'>
+                        <div className='addtop'>
+                            <Button id='addrec' colorScheme='rgb(8, 114, 181);' onClick={onAddOpen}>+ Add Review</Button>
+                        </div>
                         <div id='search'>
-                            <Input
-                                id='searchbar'
-                                focusBorderColor='blue'
-                                placeholder='Search Titles...'
-                                value={searchQuery}
-                                onChange={handleSearch}
-                            />
+                                <Input
+                                    id='searchbar'
+                                    focusBorderColor='rgb(62, 176, 246);'
+                                    placeholder='Search Titles...'
+                                    value={searchQuery}
+                                    onChange={handleSearch}
+                                />
                         </div>
                         <div className="filt_top">
                             <p>Filter:</p>
                             &nbsp;
-                            <Menu>
-                                <MenuButton size='lg'as={'d_menu'} rightIcon={<ChevronDownIcon />}>
-                                    Browse
-                                </MenuButton>
-                                <MenuList color='white' backgroundColor='gray'>
-                                    <MenuItem color='white' backgroundColor='gray'>Download</MenuItem>
-                                    <MenuItem color='white' backgroundColor='gray'>Create a Copy</MenuItem>
-                                    <MenuItem color='white' backgroundColor='gray'>Mark as Draft</MenuItem>
-                                    <MenuItem color='white' backgroundColor='gray'>Delete</MenuItem>
-                                    <MenuItem color='white' backgroundColor='gray'>Attend a Workshop</MenuItem>
-                                </MenuList>
-                                </Menu>
-                            <Select iconSize='14px' id='filter' placeholder='' onChange={handleFilterChange}>
+                            
+                            <Select iconSize='14px' id='filter' placeholder='' onChange={handleFilterChange} backgroundColor="black">
                                 <option value='None'>None</option>
                                 <option value='Your Watchlist'>Your Watchlist</option>
                                 <option value='Romance'>Romance</option>
@@ -550,11 +557,41 @@ function Filmtalk() {
                                
                             </Select>
                             </div>
-                            <div className='addtop'>
-                            <Button id='addrec' colorScheme='rgb(8, 114, 181);' onClick={onAddOpen}>+ Add</Button>
-                            </div>
-                        
+                            
                     </div>
+                    <div className='user_andinfo'>
+                    <Popover>
+                        <PopoverTrigger>
+                            <Button  _hover={{ bg: '#3eaff6' }} marginTop='5px'backgroundColor=" rgb(80, 78, 78);"><FontAwesomeIcon size="2xl" style={{color: "white",}} icon={faCircleUser} /></Button>
+                        </PopoverTrigger>
+                        <PopoverContent width='20vw'backgroundColor=" rgb(80, 78, 78);">
+                            <PopoverArrow />
+                            <PopoverCloseButton />
+                            <PopoverHeader><Avatar size='lg'name={usery} src='https://bit.ly/broken-link' /><p id='pruh'><b>Hello, {usery}</b></p><p>Welcome, Let's talk Film!</p></PopoverHeader>
+                            <PopoverBody>{isLoggedIn() && (<button onClick={handleLogout} className="logout_butt">Logout <FontAwesomeIcon size='sm' icon={faRightFromBracket} style={{color: "white",}} /></button>)}</PopoverBody>
+                        </PopoverContent>
+                    </Popover>
+                    <Popover>
+                        <PopoverTrigger>
+                            <Button _hover={{ bg: '#3eaff6' }} className="usecontrol"marginTop='5px'backgroundColor=" rgb(80, 78, 78);"><FontAwesomeIcon icon={faCircleInfo} size="2xl" style={{color: "white",}} /></Button>
+                        </PopoverTrigger>
+                        <PopoverContent width='20vw'backgroundColor=" rgb(80, 78, 78);">
+                            <PopoverArrow />
+                            <PopoverCloseButton />
+                            <PopoverHeader>Info</PopoverHeader>
+                            <PopoverBody>
+                                <ul>
+                                    <li>Press the button</li>
+                                    <li>Chat with people</li>
+                                </ul>
+                            </PopoverBody>
+                        </PopoverContent>
+                    </Popover>
+                    </div>
+                </div>
+                
+
+                <div className='moviebox'>
                     <div className='cardbox'>
                         {displayedCards.map(card => (
                             <div className='card_cont'>
@@ -575,6 +612,9 @@ function Filmtalk() {
                             </div>
                         ))}
                     </div>
+                </div>
+                <div className ='footer'>
+                    <p>	&#169; Filmtalk by Ebuka Emiko</p>
                 </div>
 
                 {/* Modal */}

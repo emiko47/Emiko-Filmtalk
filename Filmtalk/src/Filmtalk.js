@@ -7,7 +7,7 @@ import ic1 from './movie-with-students-audience-svgrepo-com.svg'
 import ic2 from './user-circle-svgrepo-com.svg';
 import { Avatar, AvatarBadge, AvatarGroup } from '@chakra-ui/react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faThumbsDown, faThumbsUp, faPaperPlane, faCircleUser, faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
+import { faThumbsDown, faThumbsUp, faCircleInfo, faPaperPlane, faCircleUser, faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
 import Rating from '@mui/material/Rating';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -559,8 +559,34 @@ function Filmtalk() {
                             </div>
                             
                     </div>
-                    <div classname='user_andinfo'>
-
+                    <div className='user_andinfo'>
+                    <Popover>
+                        <PopoverTrigger>
+                            <Button  _hover={{ bg: '#3eaff6' }} marginTop='5px'backgroundColor=" rgb(80, 78, 78);"><FontAwesomeIcon size="2xl" style={{color: "white",}} icon={faCircleUser} /></Button>
+                        </PopoverTrigger>
+                        <PopoverContent width='20vw'backgroundColor=" rgb(80, 78, 78);">
+                            <PopoverArrow />
+                            <PopoverCloseButton />
+                            <PopoverHeader><Avatar size='lg'name={usery} src='https://bit.ly/broken-link' /><p id='pruh'><b>Hello, {usery}</b></p><p>Welcome, Let's talk Film!</p></PopoverHeader>
+                            <PopoverBody>{isLoggedIn() && (<button onClick={handleLogout} className="logout_butt">Logout <FontAwesomeIcon size='sm' icon={faRightFromBracket} style={{color: "white",}} /></button>)}</PopoverBody>
+                        </PopoverContent>
+                    </Popover>
+                    <Popover>
+                        <PopoverTrigger>
+                            <Button _hover={{ bg: '#3eaff6' }} className="usecontrol"marginTop='5px'backgroundColor=" rgb(80, 78, 78);"><FontAwesomeIcon icon={faCircleInfo} size="2xl" style={{color: "white",}} /></Button>
+                        </PopoverTrigger>
+                        <PopoverContent width='20vw'backgroundColor=" rgb(80, 78, 78);">
+                            <PopoverArrow />
+                            <PopoverCloseButton />
+                            <PopoverHeader>Info</PopoverHeader>
+                            <PopoverBody>
+                                <ul>
+                                    <li>Press the button</li>
+                                    <li>Chat with people</li>
+                                </ul>
+                            </PopoverBody>
+                        </PopoverContent>
+                    </Popover>
                     </div>
                 </div>
                 
@@ -587,6 +613,9 @@ function Filmtalk() {
                             </div>
                         ))}
                     </div>
+                </div>
+                <div className ='footer'>
+                    <p>	&#169; Filmtalk by Ebuka Emiko</p>
                 </div>
 
                 {/* Modal */}

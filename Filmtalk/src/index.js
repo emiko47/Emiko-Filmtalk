@@ -15,7 +15,7 @@ root.render(
   <React.StrictMode>
     <ChakraProvider>
     <BrowserRouter>
-      <Navbar />
+      
         <Routes>
           <Route path="/" element={<Home />} />
           <Route

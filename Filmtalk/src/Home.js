@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import './index.css';
 import { isLoggedIn, setUserSession } from './AuthServices';
 import { Link, useNavigate } from 'react-router-dom';
@@ -12,6 +12,10 @@ import { faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
 
 
 const Home = () => {
+  
+
+
+
     const [currentForm, setCurrentForm] = useState('login');
     const navigate = useNavigate();
 

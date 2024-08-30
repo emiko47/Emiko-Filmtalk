@@ -592,7 +592,6 @@ function Filmtalk() {
                 
 
                 <div className='moviebox'>
-                   
                     <div className='cardbox'>
                         {displayedCards.map(card => (
                             <div className='card_cont'>

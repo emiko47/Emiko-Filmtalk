@@ -541,7 +541,7 @@ function Filmtalk() {
                             <p>Filter:</p>
                             &nbsp;
                             
-                            <Select iconSize='14px' id='filter' placeholder='' onChange={handleFilterChange} backgroundColor="black">
+                            <Select iconSize='14px' id='filter' placeholder='' onChange={handleFilterChange} bg="black" color="white">
                                 <option value='None'>None</option>
                                 <option value='Your Watchlist'>Your Watchlist</option>
                                 <option value='Romance'>Romance</option>

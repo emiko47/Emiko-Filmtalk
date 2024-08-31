@@ -341,6 +341,7 @@ code {
   margin-top: 10px;
   margin-bottom: 25px;
   height: 100%;
+  overflow-y: hidden;
 }
 
 .d_owner{
@@ -415,7 +416,7 @@ code {
 .deets{
   height: 100px;
   width: 150px;
-  overflow: hidden;
+  overflow-y: hidden;
   font-size: 12px;
   text-align: left;
 }
@@ -766,7 +767,8 @@ code {
   }
 
   .card_rightside{
-    margin-bottom: 30px;
+    margin-bottom: 15px;
+
   }
 .card_title{
   overflow-x: visible;
@@ -779,6 +781,10 @@ text-align: right;
 #comm{
   margin-right: 5px;
   width: 85%;
+}
+
+.popovers{
+  width: 60vw;
 }
 
   

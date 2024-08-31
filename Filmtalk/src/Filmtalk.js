@@ -560,29 +560,30 @@ function Filmtalk() {
                             
                     </div>
                     <div className='user_andinfo'>
-                    <Popover>
+                    <Popover >
                         <PopoverTrigger>
                             <Button  _hover={{ bg: '#3eaff6' }} marginTop='5px'backgroundColor=" rgb(80, 78, 78);"><FontAwesomeIcon size="2xl" style={{color: "white",}} icon={faCircleUser} /></Button>
                         </PopoverTrigger>
-                        <PopoverContent width='20vw'backgroundColor=" rgb(80, 78, 78);">
+                        <PopoverContent width='50vw'backgroundColor=" rgb(80, 78, 78);">
                             <PopoverArrow />
                             <PopoverCloseButton />
-                            <PopoverHeader><Avatar size='lg'name={usery} src='https://bit.ly/broken-link' /><p id='pruh'><b>Hello, {usery}</b></p><p>Welcome, Let's talk Film!</p></PopoverHeader>
+                            <PopoverHeader ><Avatar size='lg'name={usery} src='https://bit.ly/broken-link' /><p id='pruh'><b>Hello, {usery}</b></p><p>Welcome, Let's talk Film!</p></PopoverHeader>
                             <PopoverBody>{isLoggedIn() && (<button onClick={handleLogout} className="logout_butt">Logout <FontAwesomeIcon size='sm' icon={faRightFromBracket} style={{color: "white",}} /></button>)}</PopoverBody>
                         </PopoverContent>
                     </Popover>
-                    <Popover>
+                    <Popover >
                         <PopoverTrigger>
                             <Button _hover={{ bg: '#3eaff6' }} className="usecontrol"marginTop='5px'backgroundColor=" rgb(80, 78, 78);"><FontAwesomeIcon icon={faCircleInfo} size="2xl" style={{color: "white",}} /></Button>
                         </PopoverTrigger>
-                        <PopoverContent width='20vw'backgroundColor=" rgb(80, 78, 78);">
+                        <PopoverContent width='50vw'backgroundColor=" rgb(80, 78, 78);">
                             <PopoverArrow />
                             <PopoverCloseButton />
                             <PopoverHeader>Info</PopoverHeader>
                             <PopoverBody>
                                 <ul>
-                                    <li>Press the button</li>
-                                    <li>Chat with people</li>
+                                    <li>- Press the Add Review button to post a review on a title.</li>
+                                    &nbsp;
+                                    <li>- Click on each review card to see more.</li>
                                 </ul>
                             </PopoverBody>
                         </PopoverContent>
@@ -636,13 +637,19 @@ function Filmtalk() {
                                     <Select id='genre1' iconSize='20px' className='genre_filter' placeholder='None' value={movieDetails.genre1} onChange={handleChange}>
                                         <option value='Romance'>Romance</option>
                                         <option value='Thriller'>Thriller</option>
+                                        <option value='Sci-Fi'>Sci-Fi</option>
                                         <option value='Action'>Action</option>
+                                        <option value='Crime'>Crime</option>
                                         <option value='Comedy'>Comedy</option>
                                         <option value='Horror'>Horror</option>
                                         <option value='Black Voices'>Black Voices</option>
                                         <option value='Anime'>Anime</option>
                                         <option value='Fantasy'>Fantasy</option>
                                         <option value='Documentary/Docuseries'>Documentary/Docuseries</option>
+                                        <option value='Drama'>Drama</option>
+                                        <option value='Historical'>Historical</option>
+                                        <option value='Psychological Thriller'>Psychological Thriller</option>
+                                        <option value='Dark Comedy'>Dark Comedy</option>
                                     </Select>
                                 </Box>
                                 <Box id='movgenre2'>
@@ -650,17 +657,24 @@ function Filmtalk() {
                                     <Select id='genre2' iconSize='20px' className='genre_filter' placeholder='None' value={movieDetails.genre2} onChange={handleChange}>
                                         <option value='Romance'>Romance</option>
                                         <option value='Thriller'>Thriller</option>
+                                        <option value='Sci-Fi'>Sci-Fi</option>
                                         <option value='Action'>Action</option>
+                                        <option value='Crime'>Crime</option>
                                         <option value='Comedy'>Comedy</option>
                                         <option value='Horror'>Horror</option>
                                         <option value='Black Voices'>Black Voices</option>
                                         <option value='Anime'>Anime</option>
                                         <option value='Fantasy'>Fantasy</option>
                                         <option value='Documentary/Docuseries'>Documentary/Docuseries</option>
+                                        <option value='Drama'>Drama</option>
+                                        <option value='Historical'>Historical</option>
+                                        <option value='Psychological Thriller'>Psychological Thriller</option>
+                                        <option value='Dark Comedy'>Dark Comedy</option>
+
                                     </Select>
                                 </Box>
                                 <Box id='movimg'>
-                                    Image link (Optional):<Input id='img_src' focusBorderColor='rgb(62, 176, 246)' placeholder='' value={movieDetails.img_src} onChange={handleChange} />
+                                    Image link (IMDb):<Input id='img_src' focusBorderColor='rgb(62, 176, 246)' placeholder='' value={movieDetails.img_src} onChange={handleChange} />
                                 </Box>
                                 <Box id='movabout'>
                                     About:<Input id='about' focusBorderColor='rgb(62, 176, 246)' placeholder='e.g. Tell us about the movie...' value={movieDetails.about} onChange={handleChange} />

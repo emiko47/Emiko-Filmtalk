@@ -341,6 +341,7 @@ code {
   margin-top: 10px;
   margin-bottom: 25px;
   height: 100%;
+  overflow-y: hidden;
 }
 
 .d_owner{
@@ -415,7 +416,7 @@ code {
 .deets{
   height: 100px;
   width: 150px;
-  overflow: hidden;
+  overflow-y: hidden;
   font-size: 12px;
   text-align: left;
 }
@@ -489,7 +490,7 @@ code {
 .comment-section{
   display: flex;
   flex-direction: column;
-  width: 80%;
+  width: 100%;
   height: fit-content;
   margin-top: 20px;
 }
@@ -520,6 +521,7 @@ code {
 
 #comm{
   margin-right: 5px;
+  width: 90%;
 }
 
 #plane:hover{
@@ -535,6 +537,7 @@ code {
 .add-com{
   display:flex;
   flex-direction: row;
+  width: 100%;
 }
 
 
@@ -759,8 +762,13 @@ code {
   height: 100%;
   }
 
+  .moviebox{
+    width: 85vw;
+  }
+
   .card_rightside{
-    margin-bottom: 30px;
+    margin-bottom: 15px;
+
   }
 .card_title{
   overflow-x: visible;
@@ -768,6 +776,15 @@ code {
 
 .d_owner{
 text-align: right;
+}
+
+#comm{
+  margin-right: 5px;
+  width: 85%;
+}
+
+.popovers{
+  width: 60vw;
 }
 
   
